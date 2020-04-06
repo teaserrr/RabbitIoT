@@ -1,7 +1,7 @@
 #include "RabbitIoT.h"
-#include <Arduino.h>
 
-RabbitIot::RabbitIot() {
+RabbitIot::RabbitIot(const Logger& logger) {
+    _logger = logger;
     moduleCount = 0;    
 }
 
@@ -16,10 +16,10 @@ void RabbitIot::addModule(BaseModule* module){
         return;
 
     _modules[moduleCount-1] = module;
+    module->setLogger(_logger);
 }
 
 void RabbitIot::setup() {
-    Serial.begin(115200);
     for (int i = 0; i < moduleCount; i++)
         _modules[i]->setup();
 }

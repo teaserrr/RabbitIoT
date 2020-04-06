@@ -10,13 +10,13 @@ Bme280Module::~Bme280Module() {
 }
 
 void Bme280Module::setup() {
-    Serial.println("Initializing BME280 sensor...");
+    _log.debug("Initializing BME280 sensor...");
     if (!_bme->begin(0x76)) {   
-        Serial.println("Could not find a valid BME280 sensor");
+        _log.error("Could not find a valid BME280 sensor");
         setEnabled(false);
     }
     else {        
-        Serial.println("BME280 ok");
+        _log.info("BME280 ok");
     }    
 }
 
@@ -26,10 +26,7 @@ void Bme280Module::loopInner() {
     float humidity = _bme->readHumidity();
     float pressure = _bme->readPressure() / 100.0F;
 
-    Serial.print("temperature: ");
-    Serial.println(temperature);
-    Serial.print("humidity: ");
-    Serial.println(humidity);
-    Serial.print("pressure: ");
-    Serial.println(pressure);
+    _log.debug("temperature: " + String(temperature, 2));
+    _log.debug("humidity: " + String(humidity, 2));
+    _log.debug("pressure: " + String(pressure, 2));
 }

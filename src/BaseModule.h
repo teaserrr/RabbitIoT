@@ -2,6 +2,7 @@
 #define BaseModule_h
 
 #include <WString.h>
+#include "Logger.h"
 
 class BaseModule;
 
@@ -20,10 +21,13 @@ class BaseModule {
         const String getId() const;
         bool isEnabled() const;
         void setEnabled(bool enabled);
+        void setLogger(const Logger &logger);
 
     protected:
         bool shouldLoop() const;
         virtual void loopInner();
+
+        Logger _log;
 
     private:
         String _id;

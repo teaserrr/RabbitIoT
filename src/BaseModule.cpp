@@ -52,3 +52,7 @@ void BaseModule::loop() {
 void BaseModule::loopInner() {
     // default: do nothing
 }
+
+void BaseModule::setLogger(const Logger &logger) {
+    _log = logger;
+}

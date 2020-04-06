@@ -2,13 +2,14 @@
 #define RabbitIoT_h
 
 #include <WString.h>
-#include <BaseModule.h>
+#include "Logger.h"
+#include "BaseModule.h"
 
 #define MAX_MODULES 16
 
 class RabbitIot {
     public:
-        RabbitIot();
+        RabbitIot(const Logger& logger = Logger());
         ~RabbitIot();
 
         void addModule(BaseModule* module);
@@ -17,6 +18,7 @@ class RabbitIot {
         void loop();
     
     private:
+        Logger _logger;
         BaseModule* _modules[MAX_MODULES];
         int moduleCount;
 };
