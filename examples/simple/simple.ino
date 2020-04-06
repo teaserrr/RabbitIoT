@@ -4,7 +4,7 @@
 RabbitIot rabbit;
 
 void setup() {
-    BaseModule* module = new BaseModule("test", &moduleSetup, &moduleLoop);
+    BaseModule* module = new BaseModule("testModule", 1000, &moduleSetup, &moduleLoop);
     rabbit.addModule(module);
     rabbit.setup();
 }
@@ -14,7 +14,6 @@ void loop() {
 }
 
 void moduleSetup(const BaseModule* module) {
-    Serial.begin(115200);
     Serial.print("setup ");
     Serial.println(module->getId());
 }

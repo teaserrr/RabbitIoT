@@ -1,4 +1,5 @@
 #include "RabbitIoT.h"
+#include <Arduino.h>
 
 RabbitIot::RabbitIot() {
     moduleCount = 0;    
@@ -18,6 +19,7 @@ void RabbitIot::addModule(BaseModule* module){
 }
 
 void RabbitIot::setup() {
+    Serial.begin(115200);
     for (int i = 0; i < moduleCount; i++)
         _modules[i]->setup();
 }
