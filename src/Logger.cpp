@@ -41,7 +41,11 @@ void Logger::log(int level, const String& message) {
             levelChar = "ERR";
             break;
     }
-    char buffer[512];
-    sprintf(buffer, "[%u] [%s] %s", millis(), levelChar, message.c_str());
-    Serial.println(buffer);
+    Serial.print('[');
+    Serial.print(millis());
+    Serial.print("] ");
+    Serial.print('[');
+    Serial.print(levelChar);
+    Serial.print("] ");
+    Serial.println(message);
 }
