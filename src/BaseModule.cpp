@@ -12,9 +12,13 @@ BaseModule::BaseModule(String id, unsigned long loopDelay, ModuleSetup setupFunc
     _loopFunc = loopFunc;
     _loopDelay = loopDelay;
     _lastLoopTime = 0;
+    _measurements = new Measurement*[MAX_MEASUREMENTS];
 }
 
 BaseModule::~BaseModule() {
+    for (int i = 0; i < _measurementCount; i++)
+        delete _measurements[i];
+    delete _measurements;
 }
 
 const String BaseModule::getId() const {
@@ -55,4 +59,25 @@ void BaseModule::loopInner() {
 
 void BaseModule::setLogger(const Logger &logger) {
     _log = logger;
+}
+
+void BaseModule::addMeasurement(Measurement* measurement) {
+
+    _measurementCount++;
+    if (_measurementCount > MAX_MEASUREMENTS)
+        return;
+
+    _measurements[_measurementCount-1] = measurement;
+}
+
+Measurement** BaseModule::getMeasurements() const {
+    return _measurements;
+}
+
+Measurement* BaseModule::getMeasurement(const String& id) const {
+    for (int i = 0; i < _measurementCount; i++) {
+        if (_measurements[i]->getId().equals(id))
+            return _measurements[i];
+    }
+    return NULL;
 }

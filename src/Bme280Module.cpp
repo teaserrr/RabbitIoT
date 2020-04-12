@@ -3,6 +3,12 @@
 Bme280Module::Bme280Module(String id, unsigned long readInterval)
     : BaseModule(id, readInterval, NULL, NULL) {
     _bme = new Adafruit_BME280();
+    _temperature = new FloatMeasurement("temperature");
+    _humidity = new FloatMeasurement("humidity");
+    _pressure = new FloatMeasurement("pressure");
+    addMeasurement(_temperature);
+    addMeasurement(_humidity);
+    addMeasurement(_pressure);
 }
 
 Bme280Module::~Bme280Module() {
@@ -22,11 +28,11 @@ void Bme280Module::setup() {
 
 void Bme280Module::loopInner() {
     _bme->takeForcedMeasurement();
-    float temperature = _bme->readTemperature();
-    float humidity = _bme->readHumidity();
-    float pressure = _bme->readPressure() / 100.0F;
+    _temperature->updateValue(_bme->readTemperature());
+    _humidity->updateValue(_bme->readHumidity());
+    _pressure->updateValue(_bme->readPressure() / 100.0F);
 
-    _log.debug("temperature: " + String(temperature, 2));
-    _log.debug("humidity: " + String(humidity, 2));
-    _log.debug("pressure: " + String(pressure, 2));
+    _log.debug("temperature: " + _temperature->getStringValue());
+    _log.debug("humidity: " + _humidity->getStringValue());
+    _log.debug("pressure: " + _pressure->getStringValue());
 }

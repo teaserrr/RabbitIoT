@@ -4,9 +4,11 @@
 #include <WString.h>
 #include "Logger.h"
 #include "BaseModule.h"
+#include "Measurement.h"
 
+#ifndef MAX_MODULES
 #define MAX_MODULES 16
-
+#endif
 class RabbitIot {
     public:
         RabbitIot(const Logger& logger = Logger());
@@ -20,7 +22,7 @@ class RabbitIot {
     private:
         Logger _logger;
         BaseModule* _modules[MAX_MODULES];
-        int moduleCount;
+        unsigned int _moduleCount;
 };
 
 #endif

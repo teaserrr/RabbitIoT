@@ -17,6 +17,10 @@ class Bme280Module : public BaseModule {
         
         Adafruit_BME280* _bme;
 
+    private:
+        FloatMeasurement* _temperature;
+        FloatMeasurement* _humidity;
+        FloatMeasurement* _pressure;
 };
 
 #endif
