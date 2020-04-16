@@ -8,11 +8,15 @@ BaseModule::BaseModule(String id, unsigned long loopDelay)
 BaseModule::BaseModule(String id, unsigned long loopDelay, ModuleSetup setupFunc, ModuleLoop loopFunc) {
     _id = id;
     _enabled = true;
+    _firstTime = true;
     _setupFunc = setupFunc;
     _loopFunc = loopFunc;
     _loopDelay = loopDelay;
     _lastLoopTime = 0;
+    _measurementCount = 0;
     _measurements = new Measurement*[MAX_MEASUREMENTS];
+    for (int i = 0; i < MAX_MEASUREMENTS; i++)
+        _measurements[i] = NULL;
 }
 
 BaseModule::~BaseModule() {
@@ -34,7 +38,7 @@ void BaseModule::setEnabled(bool enabled) {
 }
 
 bool BaseModule::shouldLoop() const {
-    return _enabled && millis() - _lastLoopTime > _loopDelay;
+    return _enabled && (_firstTime || millis() - _lastLoopTime > _loopDelay);
 }
 
 void BaseModule::setup() {
@@ -45,6 +49,7 @@ void BaseModule::setup() {
 void BaseModule::loop() {
     if (!shouldLoop())
         return;
+    _firstTime = false;
     _lastLoopTime = millis();
 
     if (_loopFunc != NULL)

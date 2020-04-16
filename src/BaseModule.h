@@ -5,6 +5,7 @@
 #include "Logger.h"
 #include "Measurement.h"
 
+// maximum number of measurements for a single module
 #ifndef MAX_MEASUREMENTS
 #define MAX_MEASUREMENTS 5
 #endif
@@ -41,6 +42,7 @@ class BaseModule {
     private:
         String _id;
         bool _enabled;
+        bool _firstTime;
         ModuleSetup _setupFunc;
         ModuleLoop _loopFunc;
         unsigned long _loopDelay;

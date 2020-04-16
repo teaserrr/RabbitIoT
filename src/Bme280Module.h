@@ -7,7 +7,7 @@
 
 class Bme280Module : public BaseModule {
     public:
-        Bme280Module(String id = "BME280", unsigned long readInterval = 10000);
+        Bme280Module(const String& id = "BME280", unsigned long readInterval = 10000, const String& baseMqttPath = "bme280/");
         ~Bme280Module();
 
         virtual void setup();
@@ -21,6 +21,8 @@ class Bme280Module : public BaseModule {
         FloatMeasurement* _temperature;
         FloatMeasurement* _humidity;
         FloatMeasurement* _pressure;
+
+        String _baseMqttPath;
 };
 
 #endif

@@ -6,6 +6,10 @@ Logger::Logger(int logLevel, int baudRate) {
     Serial.begin(baudRate);
 }
 
+void Logger::trace(const String& message) {
+    log(LOGLEVEL_TRACE, message);
+}
+
 void Logger::debug(const String& message) {
     log(LOGLEVEL_DEBUG, message);
 }
@@ -28,6 +32,9 @@ void Logger::log(int level, const String& message) {
 
     const char *levelChar;
     switch (level) {
+        case LOGLEVEL_TRACE:
+            levelChar = "TRC";
+            break;
         case LOGLEVEL_DEBUG:
             levelChar = "DBG";
             break;

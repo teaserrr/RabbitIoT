@@ -18,25 +18,57 @@ class Measurement {
 
         unsigned long getLastUpdated() const { return _lastUpdate; }
 
+        bool shouldPublish() {
+            return _mqttTopic.length() > 0 && 
+                    !_neverUpdated &&
+                    (
+                        (_isUpdated && (intervalExceeded(_maxPublishInterval) || _maxPublishInterval == 0))
+                        || intervalExceeded(_minPublishInterval)
+                    );
+        }
+
+        void setPublished() {
+            if (!_isUpdated)
+                updateTimestamp();
+            resetUpdated();
+        }
+
     protected:
-        Measurement(const String& id, const String& description="", const String& unit="", const String& mqttTopic="") {
+        Measurement(const String& id, const String& description="", const String& unit="", const String& mqttTopic="", unsigned long minPublishInterval = 0, unsigned long maxPublishInterval = 0) {
             _id = id;
             _description = description;
             _unit = unit;
             _mqttTopic = mqttTopic;
+            _minPublishInterval = minPublishInterval;
+            _maxPublishInterval = maxPublishInterval;
+            _isUpdated = false;
+            _lastUpdate = 0;
+            _neverUpdated = true;
         }
 
         void updateTimestamp(unsigned long timestamp=0) {
             _lastUpdate = timestamp == 0 ? millis() : timestamp;
         }
 
+        void setUpdated() { _isUpdated = true; _neverUpdated = false; }
+        void resetUpdated() { _isUpdated = false; }
+        
+        bool _neverUpdated;
+
     private:
+        bool intervalExceeded(unsigned long interval) {
+            return interval > 0 && millis() - _lastUpdate > interval; 
+        }
+
         String _id;
         String _description;
         String _unit;
         String _mqttTopic;
+        unsigned long _minPublishInterval;
+        unsigned long _maxPublishInterval;
 
         unsigned long _lastUpdate;
+        bool _isUpdated;
 };
 
 class FloatMeasurement : public Measurement {
@@ -49,8 +81,11 @@ class FloatMeasurement : public Measurement {
         }
 
         void updateValue(float value) {
-            _lastValue = value;
-            updateTimestamp();
+            if (_lastValue != value || _neverUpdated) { 
+                _lastValue = value;
+                updateTimestamp();
+                setUpdated();
+            }
         }
 
     private:
