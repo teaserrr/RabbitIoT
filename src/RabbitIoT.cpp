@@ -36,9 +36,9 @@ void RabbitIot::loop() {
     _mqttClient->loop();
 
     for (int i = 0; i < _moduleCount; i++) {
-        _logger.trace("loop: " + _modules[i]->getId());
+        _logger.log(LOGLEVEL_TRACE, "loop: %s", _modules[i]->getId().c_str());
         _modules[i]->loop();
-        _logger.trace("publish: " + _modules[i]->getId());
+        _logger.log(LOGLEVEL_TRACE, "publish: %s", _modules[i]->getId().c_str());
         publishMeasurements(_modules[i]->getMeasurements());
     }
 }
@@ -64,7 +64,7 @@ void RabbitIot::publishMeasurements(Measurement** measurements) {
     int i = 0;
     while (i < MAX_MEASUREMENTS && measurements[i]) {
         if (measurements[i]->shouldPublish()) {
-            _logger.debug("Publish measurement: " + measurements[i]->getId() + " value: " + measurements[i]->getStringValue());
+            _logger.log(LOGLEVEL_DEBUG, "Publish measurement: %s value: %s", measurements[i]->getId().c_str(), measurements[i]->getStringValue().c_str());
             _mqttClient->publish(measurements[i]->getMqttTopic(), measurements[i]->getStringValue());
             measurements[i]->setPublished();
         }

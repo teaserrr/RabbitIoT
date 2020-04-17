@@ -72,12 +72,9 @@ void MqttClient::createSubscriptions() {
 }
 
 void MqttClient::onMessageReceived(const String& topic, byte* payload, unsigned int length) {
-    _logger.info("Received MQTT message");
-    _logger.info("  topic: " + topic);
-    _logger.info("  length: " + length);
-    // TODO optimize by providing logging for byte arrays
-    char* buf = new char[length+1];
-    strncpy(buf, (char*)payload, length);
-    _logger.info("  payload: " + *buf);
+    char* cPayload = new char[length+1];
+    strncpy(cPayload, (char*)payload, length);
+    _logger.log(LOGLEVEL_INFO, "Received MQTT message - topic: %s - length: %u - payload: %s", topic.c_str(), length, cPayload);
+    
     // TODO handle message
 }

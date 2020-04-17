@@ -1,8 +1,6 @@
 #ifndef Logger_h
 #define Logger_h
 
-#include <WString.h>
-
 #define LOGLEVEL_TRACE 10
 #define LOGLEVEL_DEBUG 20
 #define LOGLEVEL_INFO 30
@@ -17,20 +15,24 @@
 #define DEFAULT_BAUDRATE 115200
 #endif
 
+#ifndef LOGBUF_SIZE
+#define LOGBUF_SIZE 1024
+#endif
+
 class Logger {
     public:
         Logger(int logLevel = DEFAULT_LOGLEVEL, int baudRate = DEFAULT_BAUDRATE);
 
-        void trace(const String& message);
-        void debug(const String& message);
-        void info(const String& message);
-        void warning(const String& message);
-        void error(const String& message);
+        void trace(const char* message);
+        void debug(const char* message);
+        void info(const char* message);
+        void warning(const char* message);
+        void error(const char* message);
+        void log(int level, const char* message, ...);
     
     private:
-        void log(int level, const String& message);
-
         int _logLevel;
+        char _logbuf[LOGBUF_SIZE];
 };
 
 #endif

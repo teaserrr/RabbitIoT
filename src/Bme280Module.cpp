@@ -42,7 +42,7 @@ void Bme280Module::loopInner() {
     _humidity->updateValue(_bme->readHumidity());
     _pressure->updateValue(_bme->readPressure() / 100.0F);
 
-    _log.debug("temperature: " + _temperature->getStringValue());
-    _log.debug("humidity: " + _humidity->getStringValue());
-    _log.debug("pressure: " + _pressure->getStringValue());
+    _log.log(LOGLEVEL_DEBUG, "temperature: %s", _temperature->getStringValue().c_str());
+    _log.log(LOGLEVEL_DEBUG, "humidity: %s", _humidity->getStringValue().c_str());
+    _log.log(LOGLEVEL_DEBUG, "pressure: %s", _pressure->getStringValue().c_str());
 }
