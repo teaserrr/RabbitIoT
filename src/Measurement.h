@@ -10,7 +10,7 @@
 
 class Measurement {
     public:
-        Measurement(const Logger& logger, const char* id, const char* description = NULL, const char* unit = NULL, char* mqttTopic = NULL, 
+        Measurement(const Logger& logger, const char* id, const char* description = NULL, const char* unit = NULL, const char* mqttTopic = NULL, 
                     unsigned long minPublishInterval = 0, unsigned long maxPublishInterval = 0);
         ~Measurement();
 

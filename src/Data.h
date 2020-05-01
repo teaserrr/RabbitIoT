@@ -42,13 +42,24 @@ class BoolData : public BaseData {
         BoolData(bool data) : 
             BaseData(Bool) {
             _value = data;
+            _buf[0] = _value ? '1' : '0';
+            _buf[1] = 0;
         }
 
-        int value() const { return _value; }
-
-        virtual const char* stringValue() const {
-            return _value ? "0" : "1";
+        BoolData(const BoolData& other) :
+            BaseData(other) {
+            _value = other._value;
+            _buf[0] = other._buf[0];
+            _buf[1] = 0;
         }
+
+        virtual BaseData* copy() const {
+            return new BoolData(*this);
+        }
+
+        bool value() const { return _value; }
+
+        virtual const char* stringValue() const { return _buf; }
 
         virtual bool equals(const BaseData& other) const {
             return other.dataType() == dataType() && ((BoolData&)other)._value == _value;
@@ -57,7 +68,6 @@ class BoolData : public BaseData {
     private:
         bool _value;
         char _buf[2];
-
 };
 
 class IntegerData : public BaseData {
@@ -66,6 +76,16 @@ class IntegerData : public BaseData {
             BaseData(Int) {
             _value = data;
             itoa(_value, _buf, 10);
+        }
+
+        IntegerData(const IntegerData& other) :
+            BaseData(other) {
+            _value = other._value;
+            strcpy(_buf, other._buf);
+        }
+
+        virtual BaseData* copy() const {
+            return new IntegerData(*this);
         }
 
         int value() const { return _value; }

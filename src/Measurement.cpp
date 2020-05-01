@@ -1,7 +1,7 @@
 #include "Measurement.h"
 #include <Arduino.h>
 
-Measurement::Measurement(const Logger& logger, const char* id, const char* description, const char* unit, char* mqttTopic, unsigned long minPublishInterval , unsigned long maxPublishInterval) {
+Measurement::Measurement(const Logger& logger, const char* id, const char* description, const char* unit, const char* mqttTopic, unsigned long minPublishInterval , unsigned long maxPublishInterval) {
     _log = logger;
     _id = id;
     _description = description;
@@ -17,8 +17,6 @@ Measurement::Measurement(const Logger& logger, const char* id, const char* descr
 }
 
 Measurement::~Measurement() {
-    if (_mqttTopic)
-        delete _mqttTopic;
 }
 
 void Measurement::updateValue(const BaseData& value) {
