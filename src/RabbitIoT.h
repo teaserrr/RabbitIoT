@@ -13,7 +13,7 @@
 #endif
 class RabbitIot {
     public:
-        RabbitIot(const String& deviceName, const Logger& logger = Logger());
+        RabbitIot(const char* deviceName, const Logger& logger = Logger());
         ~RabbitIot();
 
         void addModule(BaseModule* module);
@@ -21,7 +21,7 @@ class RabbitIot {
         void setup();
         void loop();
     
-        const String& getDeviceName() const { return _deviceName; }
+        const char* getDeviceName() const { return _deviceName; }
 
     protected:
         void setupWifi();
@@ -32,7 +32,7 @@ class RabbitIot {
         Logger _logger;
         MqttClient* _mqttClient;
         BaseModule* _modules[MAX_MODULES];
-        String _deviceName;
+        const char* _deviceName;
         unsigned int _moduleCount;
 };
 

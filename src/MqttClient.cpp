@@ -32,7 +32,6 @@ void MqttClient::setup() {
 
 void MqttClient::loop()
 {
-  _logger.trace("MqttClient::loop");
   if (!_pubSubClient->connected()) 
   {
     if (_lastMqttReconnectAttempt == 0)

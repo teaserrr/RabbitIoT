@@ -2,94 +2,51 @@
 #define Measurement_h
 
 #include "Logger.h"
-#include <Arduino.h>
-#include <WString.h>
+#include "Data.h"
+
+#define I_1MINUTE 60000
+#define I_1HOUR 3600000
+#define I_1DAY 86400000
 
 class Measurement {
     public:
-        ~Measurement() { }
+        Measurement(const Logger& logger, const char* id, const char* description = NULL, const char* unit = NULL, char* mqttTopic = NULL, 
+                    unsigned long minPublishInterval = 0, unsigned long maxPublishInterval = 0);
+        ~Measurement();
 
-        const String getId() const { return _id; }
-        const String getDescription() const { return _description; }
-        const String getUnit() const { return _unit; }
-        const String getMqttTopic() const { return _mqttTopic; }
+        const char* getId() const { return _id; }
+        const char* getDescription() const { return _description; }
+        const char* getUnit() const { return _unit; }
+        const char* getMqttTopic() const { return _mqttTopic; }
     
-        virtual const String getStringValue() const = 0;
+        void updateValue(const BaseData& value);
 
+        virtual const char* getStringValue() { return _data ? _data->stringValue() : ""; }
+        const BaseData* data() const { return _data; }
         unsigned long getLastUpdated() const { return _lastUpdate; }
-
-        bool shouldPublish() {
-            return _mqttTopic.length() > 0 && 
-                    !_neverUpdated &&
-                    (
-                        (_isUpdated && (intervalExceeded(_maxPublishInterval) || _maxPublishInterval == 0))
-                        || intervalExceeded(_minPublishInterval)
-                    );
-        }
-
-        void setPublished() {
-            if (!_isUpdated)
-                updateTimestamp();
-            resetUpdated();
-        }
+        bool shouldPublish() const;
+        void setPublished();
 
     protected:
-        Measurement(const String& id, const String& description="", const String& unit="", const String& mqttTopic="", unsigned long minPublishInterval = 0, unsigned long maxPublishInterval = 0) {
-            _id = id;
-            _description = description;
-            _unit = unit;
-            _mqttTopic = mqttTopic;
-            _minPublishInterval = minPublishInterval;
-            _maxPublishInterval = maxPublishInterval;
-            _isUpdated = false;
-            _lastUpdate = 0;
-            _neverUpdated = true;
-        }
-
-        void updateTimestamp(unsigned long timestamp=0) {
-            _lastUpdate = timestamp == 0 ? millis() : timestamp;
-        }
-
-        void setUpdated() { _isUpdated = true; _neverUpdated = false; }
-        void resetUpdated() { _isUpdated = false; }
-        
-        bool _neverUpdated;
+        void updateTimestamp(unsigned long timestamp=0);
+        void setUpdated() { _isUpdated = true; }
+        void resetUpdated();
+        bool intervalExceeded(unsigned long interval) const;
 
     private:
-        bool intervalExceeded(unsigned long interval) {
-            return interval > 0 && millis() - _lastUpdate > interval; 
-        }
-
-        String _id;
-        String _description;
-        String _unit;
-        String _mqttTopic;
+        Logger _log;
+        const BaseData* _data;
+        const char* _id;
+        const char* _description;
+        const char* _unit;
+        const char* _mqttTopic;
         unsigned long _minPublishInterval;
         unsigned long _maxPublishInterval;
 
         unsigned long _lastUpdate;
+        unsigned long _lastPublish;
         bool _isUpdated;
-};
-
-class FloatMeasurement : public Measurement {
-    public:        
-        FloatMeasurement(const String& id, const String& description="", const String& unit="", const String& mqttTopic="") :
-            Measurement(id, description, unit, mqttTopic) {}
-
-        virtual const String getStringValue() const {
-            return String(_lastValue, 2);
-        }
-
-        void updateValue(float value) {
-            if (_lastValue != value || _neverUpdated) { 
-                _lastValue = value;
-                updateTimestamp();
-                setUpdated();
-            }
-        }
-
-    private:
-        float _lastValue;
+        bool _firstTimePublish;
 };
 
 #endif

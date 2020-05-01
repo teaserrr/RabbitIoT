@@ -7,7 +7,7 @@
 
 class Bme280Module : public BaseModule {
     public:
-        Bme280Module(const String& id = "BME280", unsigned long readInterval = 10000, const String& baseMqttPath = "bme280/");
+        Bme280Module(const char* id = "BME280", unsigned long readInterval = 10000, const char* baseMqttPath = "bme280/");
         ~Bme280Module();
 
         virtual void setup();
@@ -18,11 +18,11 @@ class Bme280Module : public BaseModule {
         Adafruit_BME280* _bme;
 
     private:
-        FloatMeasurement* _temperature;
-        FloatMeasurement* _humidity;
-        FloatMeasurement* _pressure;
-
-        String _baseMqttPath;
+        Measurement* _temperature;
+        Measurement* _humidity;
+        Measurement* _pressure;
+        
+        const char* _baseMqttPath;
 };
 
 #endif

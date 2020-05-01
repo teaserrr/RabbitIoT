@@ -1,7 +1,6 @@
 #ifndef BaseModule_h
 #define BaseModule_h
 
-#include <WString.h>
 #include "Logger.h"
 #include "Measurement.h"
 
@@ -17,14 +16,14 @@ typedef void (*ModuleLoop) (const BaseModule* module);
 
 class BaseModule {
     public:
-        BaseModule(String id, unsigned long loopDelay);
-        BaseModule(String id, unsigned long loopDelay, ModuleSetup setupFunc, ModuleLoop loopFunc);
+        BaseModule(const char* id, unsigned long loopDelay);
+        BaseModule(const char* id, unsigned long loopDelay, ModuleSetup setupFunc, ModuleLoop loopFunc);
         ~BaseModule();
 
         virtual void setup();
         void loop();
 
-        const String getId() const;
+        const char* getId() const;
         bool isEnabled() const;
         void setEnabled(bool enabled);
         void setLogger(const Logger& logger);
@@ -36,11 +35,11 @@ class BaseModule {
         bool shouldLoop() const;
         virtual void loopInner();
 
-        Measurement* getMeasurement(const String& id) const;
+        Measurement* getMeasurement(const char* id) const;
         Logger _log;
 
     private:
-        String _id;
+        const char* _id;
         bool _enabled;
         bool _firstTime;
         ModuleSetup _setupFunc;
@@ -51,5 +50,7 @@ class BaseModule {
         Measurement** _measurements;
         unsigned int _measurementCount;
 };
+
+char* concat(const char* str1, const char* str2);
 
 #endif

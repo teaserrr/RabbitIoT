@@ -1,7 +1,7 @@
 #include "RabbitIoT.h"
 #include <WiFiManager.h>
 
-RabbitIot::RabbitIot(const String& deviceName, const Logger& logger) {
+RabbitIot::RabbitIot(const char* deviceName, const Logger& logger) {
     _deviceName = deviceName;
     _logger = logger;
     _moduleCount = 0;
@@ -36,9 +36,7 @@ void RabbitIot::loop() {
     _mqttClient->loop();
 
     for (int i = 0; i < _moduleCount; i++) {
-        _logger.log(LOGLEVEL_TRACE, "loop: %s", _modules[i]->getId().c_str());
         _modules[i]->loop();
-        _logger.log(LOGLEVEL_TRACE, "publish: %s", _modules[i]->getId().c_str());
         publishMeasurements(_modules[i]->getMeasurements());
     }
 }
@@ -64,7 +62,7 @@ void RabbitIot::publishMeasurements(Measurement** measurements) {
     int i = 0;
     while (i < MAX_MEASUREMENTS && measurements[i]) {
         if (measurements[i]->shouldPublish()) {
-            _logger.log(LOGLEVEL_DEBUG, "Publish measurement: %s value: %s", measurements[i]->getId().c_str(), measurements[i]->getStringValue().c_str());
+            _logger.log(LOGLEVEL_DEBUG, "Publish measurement: %s value: %s", measurements[i]->getId(), measurements[i]->getStringValue());
             _mqttClient->publish(measurements[i]->getMqttTopic(), measurements[i]->getStringValue());
             measurements[i]->setPublished();
         }

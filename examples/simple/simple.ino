@@ -1,7 +1,7 @@
 #include <RabbitIoT.h>
 #include <Arduino.h>
 
-RabbitIot rabbit;
+RabbitIot rabbit("testRabbit");
 
 void setup() {
     BaseModule* module = new BaseModule("testModule", 1000, &moduleSetup, &moduleLoop);

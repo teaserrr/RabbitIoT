@@ -1,11 +1,11 @@
 #include "BaseModule.h"
 #include <Arduino.h>
 
-BaseModule::BaseModule(String id, unsigned long loopDelay)
+BaseModule::BaseModule(const char* id, unsigned long loopDelay)
     : BaseModule(id, loopDelay, NULL, NULL) {
 }
 
-BaseModule::BaseModule(String id, unsigned long loopDelay, ModuleSetup setupFunc, ModuleLoop loopFunc) {
+BaseModule::BaseModule(const char* id, unsigned long loopDelay, ModuleSetup setupFunc, ModuleLoop loopFunc) {
     _id = id;
     _enabled = true;
     _firstTime = true;
@@ -25,7 +25,7 @@ BaseModule::~BaseModule() {
     delete _measurements;
 }
 
-const String BaseModule::getId() const {
+const char* BaseModule::getId() const {
     return _id;
 }
 
@@ -79,10 +79,18 @@ Measurement** BaseModule::getMeasurements() const {
     return _measurements;
 }
 
-Measurement* BaseModule::getMeasurement(const String& id) const {
+Measurement* BaseModule::getMeasurement(const char* id) const {
     for (int i = 0; i < _measurementCount; i++) {
-        if (_measurements[i]->getId().equals(id))
+        if (strcmp(_measurements[i]->getId(), id) == 0)
             return _measurements[i];
     }
     return NULL;
+}
+
+char* concat(const char* str1, const char* str2) {
+    size_t len = strlen(str1) + strlen(str2);
+    char* buf = new char[len+1];
+    strcpy(buf, str1);
+    strcat(buf, str2);
+    return buf;
 }
