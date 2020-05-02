@@ -6,11 +6,13 @@ RabbitIot::RabbitIot(const char* deviceName, const Logger& logger) {
     _logger = logger;
     _moduleCount = 0;
     _mqttClient = NULL;
+    _webServer = NULL;
 }
 
 RabbitIot::~RabbitIot() {
-    if (_mqttClient != NULL)
-        delete _mqttClient;
+    if (_mqttClient != NULL) delete _mqttClient;
+    if (_webServer != NULL) delete _webServer;
+
     for (int i = 0; i < _moduleCount; i++)
         delete _modules[i];
 }
@@ -30,17 +32,19 @@ void RabbitIot::setup() {
 
     for (int i = 0; i < _moduleCount; i++)
         _modules[i]->setup();
+
+    setupWebServer();
 }
 
 void RabbitIot::loop() {
     _mqttClient->loop();
+    _webServer->loop();
 
     for (int i = 0; i < _moduleCount; i++) {
         _modules[i]->loop();
         publishMeasurements(_modules[i]->getMeasurements());
     }
 }
-
 void RabbitIot::setupWifi() {
     _logger.info("Starting WiFiManager autoconnect...");
     WiFiManager wifiManager;
@@ -58,6 +62,12 @@ void RabbitIot::setupMqtt()
     _mqttClient->setup();
 }
 
+void RabbitIot::setupWebServer() {
+    _logger.debug("Setting up WebServer...");
+    _webServer = new WebServer(_logger);
+    _webServer->setup(getDeviceName(), getMeasurements());
+}
+
 void RabbitIot::publishMeasurements(Measurement** measurements) {
     int i = 0;
     while (i < MAX_MEASUREMENTS && measurements[i]) {
@@ -69,3 +79,19 @@ void RabbitIot::publishMeasurements(Measurement** measurements) {
         i++;
     }
 }
+
+Measurement** RabbitIot::getMeasurements() const {
+    Measurement** measurements = new Measurement*[_moduleCount * MAX_MEASUREMENTS + 1];
+    int index = 0;
+    for (int i = 0; i < _moduleCount; i++) {
+        Measurement** moduleMeasurements = _modules[i]->getMeasurements();
+        int j = 0;
+        while (j < MAX_MEASUREMENTS && moduleMeasurements[j]) {
+            measurements[index++] = moduleMeasurements[j];
+            j++;
+        }
+    }
+    measurements[index] = NULL;
+    return measurements;
+}
+
