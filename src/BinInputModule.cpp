@@ -1,9 +1,8 @@
 #include "BinInputModule.h"
 
 BinInputModule::BinInputModule(const char* id, uint8_t pin, unsigned long loopDelay, const char* mqttPath)
-    : BaseModule(id, loopDelay, NULL, NULL) {
+    : BaseModule(id, loopDelay, mqttPath, NULL, NULL) {
         _pin = pin;
-        _mqttPath = mqttPath;
 }
 
 BinInputModule::~BinInputModule() {
@@ -14,7 +13,7 @@ BinInputModule::~BinInputModule() {
 
 void BinInputModule::setup() {
     _log.debug("Setting up Binary input module...");
-    _state = new Measurement(_log, "state", "Input state", "", _mqttPath);
+    _state = new Measurement(_log, "state", "Input state", "", getMqttPath());
     addMeasurement(_state);
     pinMode(_pin, INPUT);
 }

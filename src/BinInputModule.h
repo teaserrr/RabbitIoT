@@ -16,7 +16,6 @@ class BinInputModule : public BaseModule {
     private:
         Measurement* _state;
         uint8_t _pin;
-        const char* _mqttPath;
 };
 
 #endif

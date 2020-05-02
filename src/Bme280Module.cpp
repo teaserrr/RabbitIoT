@@ -1,14 +1,17 @@
 #include "Bme280Module.h"
 
 Bme280Module::Bme280Module(const char* id, unsigned long readInterval, const char* baseMqttPath)
-    : BaseModule(id, readInterval, NULL, NULL) {
+    : BaseModule(id, readInterval, baseMqttPath, NULL, NULL) {
         _bme = NULL;
-        _baseMqttPath = baseMqttPath;
 }
 
 Bme280Module::~Bme280Module() {
     if (_bme != NULL) {
         delete _bme;
+        // delete strings that were created with concat()
+        delete _temperature->getMqttTopic();
+        delete _humidity->getMqttTopic();
+        delete _pressure->getMqttTopic();
         delete _temperature;
         delete _humidity;
         delete _pressure;
@@ -18,9 +21,9 @@ Bme280Module::~Bme280Module() {
 void Bme280Module::setup() {
     _log.debug("Setting up Bme280Module...");
     _bme = new Adafruit_BME280();
-    _temperature = new Measurement(_log, "temperature", "Temperature", "°C", concat(_baseMqttPath, "temperature"));
-    _humidity = new Measurement(_log, "humidity", "Humidity", "%", concat(_baseMqttPath, "humidity"));
-    _pressure = new Measurement(_log, "pressure", "Pressure", "hPa", concat(_baseMqttPath, "pressure"), 0, I_1HOUR);
+    _temperature = new Measurement(_log, "temperature", "Temperature", "°C", concat(getMqttPath(), "temperature"));
+    _humidity = new Measurement(_log, "humidity", "Humidity", "%", concat(getMqttPath(), "humidity"));
+    _pressure = new Measurement(_log, "pressure", "Pressure", "hPa", concat(getMqttPath(), "pressure"), 0, I_1HOUR);
     addMeasurement(_temperature);
     addMeasurement(_humidity);
     addMeasurement(_pressure);

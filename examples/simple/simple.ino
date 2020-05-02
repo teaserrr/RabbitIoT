@@ -4,7 +4,7 @@
 RabbitIot rabbit("testRabbit");
 
 void setup() {
-    BaseModule* module = new BaseModule("testModule", 1000, &moduleSetup, &moduleLoop);
+    BaseModule* module = new BaseModule("testModule", 1000, NULL, &moduleSetup, &moduleLoop);
     rabbit.addModule(module);
     rabbit.setup();
 }

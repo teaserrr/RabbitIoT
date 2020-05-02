@@ -21,8 +21,6 @@ class Bme280Module : public BaseModule {
         Measurement* _temperature;
         Measurement* _humidity;
         Measurement* _pressure;
-        
-        const char* _baseMqttPath;
 };
 
 #endif

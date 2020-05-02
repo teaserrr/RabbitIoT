@@ -1,12 +1,13 @@
 #include "BaseModule.h"
 #include <Arduino.h>
 
-BaseModule::BaseModule(const char* id, unsigned long loopDelay)
-    : BaseModule(id, loopDelay, NULL, NULL) {
+BaseModule::BaseModule(const char* id, unsigned long loopDelay, const char* mqttPath)
+    : BaseModule(id, loopDelay, mqttPath, NULL, NULL) {
 }
 
-BaseModule::BaseModule(const char* id, unsigned long loopDelay, ModuleSetup setupFunc, ModuleLoop loopFunc) {
+BaseModule::BaseModule(const char* id, unsigned long loopDelay, const char* mqttPath, ModuleSetup setupFunc, ModuleLoop loopFunc) {
     _id = id;
+    _mqttPath = mqttPath;
     _enabled = true;
     _firstTime = true;
     _setupFunc = setupFunc;
@@ -31,6 +32,9 @@ const char* BaseModule::getId() const {
 
 bool BaseModule::isEnabled() const {
     return _enabled;
+}
+const char* BaseModule::getMqttPath() const { 
+    return _mqttPath; 
 }
 
 void BaseModule::setEnabled(bool enabled) {
