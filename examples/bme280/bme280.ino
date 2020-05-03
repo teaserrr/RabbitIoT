@@ -1,5 +1,5 @@
 #include <RabbitIoT.h>
-#include <Bme280Module.h>
+#include <modules/Bme280Module.h>
 
 Logger logger(LOGLEVEL_DEBUG);
 RabbitIot rabbit("testRabbit", logger);

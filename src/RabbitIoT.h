@@ -4,7 +4,7 @@
 #include <WString.h>
 #include <PubSubClient.h>
 #include "Logger.h"
-#include "BaseModule.h"
+#include "modules/BaseModule.h"
 #include "Measurement.h"
 #include "MqttClient.h"
 #include "WebServer.h"

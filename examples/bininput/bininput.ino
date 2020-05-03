@@ -1,5 +1,5 @@
 #include <RabbitIoT.h>
-#include <BinInputModule.h>
+#include <modules/BinInputModule.h>
 
 #define INPUT_PIN 14 // D5
 

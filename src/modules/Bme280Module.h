@@ -1,7 +1,7 @@
 #ifndef Bme280Module_h
 #define Bme280Module_h
 
-#include <BaseModule.h>
+#include "BaseModule.h"
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
 

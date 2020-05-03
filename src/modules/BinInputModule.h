@@ -1,7 +1,7 @@
 #ifndef BinInputModule_h
 #define BinInputModule_h
 
-#include <BaseModule.h>
+#include "BaseModule.h"
 
 /**
  * Implementation of a module for reading a digital input pin.
