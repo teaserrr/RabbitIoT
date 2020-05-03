@@ -6,8 +6,11 @@
 #include <math.h>
 #include <Arduino.h>
 
+/**
+ * Abstract class for representing sensor data.
+ */
 class BaseData {
-    public:    
+    public:
         enum DataType {
             None,
             Bool,
@@ -15,18 +18,33 @@ class BaseData {
             Float
         };
 
+        /**
+         * Call this constructor from subclasses with the correct data type.
+         */
         BaseData(DataType dataType = None) { _dataType = dataType; }
 
+        /**
+         * Copy constructor. Call this from the specific copy constructor in a subclass.
+         */
         BaseData(const BaseData& other) {
             _dataType = other._dataType;
         }
 
+        /**
+         * Copy method. Override this in subclasses and call the specific copy constructor of the subclass.
+         */
         virtual BaseData* copy() const {
             return new BaseData(*this);
         }
 
+        /**
+         * Gets the value as a string. Override this in subclasses.
+         */
         virtual const char* stringValue() const { return ""; };
 
+        /**
+         * Returns true when both the data type and value are the same. Override this in subclasses.
+         */
         virtual bool equals(const BaseData& other) const {
             return other.dataType() == None;
         }
@@ -37,6 +55,9 @@ class BaseData {
         DataType _dataType;
 };
 
+/**
+ * Data class for boolean data: ON/OFF, HIGH/LOW, OPEN/CLOSE, etc.
+ */
 class BoolData : public BaseData {
     public:
         BoolData(bool data) : 
@@ -70,6 +91,9 @@ class BoolData : public BaseData {
         char _buf[2];
 };
 
+/**
+ * Data class for integral number data.
+ */
 class IntegerData : public BaseData {
     public:
         IntegerData(long data)  : 
@@ -101,6 +125,12 @@ class IntegerData : public BaseData {
         char _buf[12]; // 10 digits, sign and \0
 };
 
+/**
+ * Data class for floating point number data.
+ * The precision parameter determines the number of relevant decimals. It is used for:
+ * - determining whether 2 values are the same. E.g. when set to 2, differences smaller than 0.01 are ignored.
+ * - formatting the data as a string. E.g. when set to 2, a value of 3.6666 is formatted as 3.67
+ */
 class FloatData : public BaseData {
     public:
         FloatData(float data = 0, int precision = 2) : 
