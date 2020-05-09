@@ -45,14 +45,21 @@ void RabbitIot::loop() {
         publishMeasurements(_modules[i]->getMeasurements());
     }
 }
+
+//#define WIFI_CONFIG_PORTAL
+
 void RabbitIot::setupWifi() {
-    _logger.info("Starting WiFiManager autoconnect...");
     WiFiManager wifiManager;
+#ifndef WIFI_CONFIG_PORTAL
+    _logger.info("Starting WiFiManager autoconnect...");
     wifiManager.setDebugOutput(false);
     wifiManager.autoConnect();
-    //wifiManager.startConfigPortal("OnDemandAP");
-    //_logger.info("Connected to: " + WiFi.SSID());
-    //_logger.info("IP address: " + WiFi.localIP().toString());
+#else
+    _logger.info("Starting WiFiManager config portal...");
+    wifiManager.startConfigPortal("OnDemandAP");
+#endif
+    _logger.log(LOGLEVEL_INFO, "Connected to: %s", WiFi.SSID().c_str());
+    _logger.log(LOGLEVEL_INFO, "IP address: %s", WiFi.localIP().toString().c_str());
 }
 
 void RabbitIot::setupMqtt()
