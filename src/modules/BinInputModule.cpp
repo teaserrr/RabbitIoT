@@ -3,6 +3,7 @@
 BinInputModule::BinInputModule(const char* id, uint8_t pin, unsigned long loopDelay, const char* mqttPath)
     : BaseModule(id, loopDelay, mqttPath, NULL, NULL) {
         _pin = pin;
+        _state = NULL;
 }
 
 BinInputModule::~BinInputModule() {
