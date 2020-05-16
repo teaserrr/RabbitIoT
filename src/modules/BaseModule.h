@@ -3,10 +3,16 @@
 
 #include "Logger.h"
 #include "Measurement.h"
+#include "ConfigParameter.h"
 
 // maximum number of measurements for a single module
 #ifndef MAX_MEASUREMENTS
 #define MAX_MEASUREMENTS 5
+#endif
+
+// maximum number of configuration parameters for a single module
+#ifndef MAX_CONFIG_PARAMETERS
+#define MAX_CONFIG_PARAMETERS 5
 #endif
 
 class BaseModule;
@@ -15,7 +21,7 @@ typedef void (*ModuleSetup) (const BaseModule* module);
 typedef void (*ModuleLoop) (const BaseModule* module);
 
 /**
- * A configurable module that can hold multiple measurements.
+ * A configurable module that can hold multiple measurements and configuration parameters.
  * 
  * This class can be subclassed to provide more specific functionality.
  * Subclasses can override setup() and loopInner() to execute specific setup and runtime logic.
@@ -73,6 +79,18 @@ class BaseModule {
         // Gets all measurements of this module.
         Measurement** getMeasurements() const;
 
+        // Gets the measurement with the specified id. Returns NULL when this module has no measurement with this id.
+        Measurement* getMeasurement(const char* id) const;
+
+        // Adds a configuration parameter. Call this before setup.
+        void addConfigParameter(ConfigParameter* configParameter);
+
+        // Gets all configuration parameters of this module.
+        ConfigParameter** getConfigParameters() const;
+
+        // Gets the configuration parameter with the specified id. Returns NULL when this module has no parameter with this id.
+        ConfigParameter* getConfigParameter(const char* id) const;
+
     protected:
         // Determines whether the loop logic should be executed.
         // Returns true if the module is enabled and the loopDelay interval has passed.
@@ -83,9 +101,6 @@ class BaseModule {
         virtual void loopInner();
 
         const char* getMqttPath() const;
-
-        // Gets the measurement with the specified id. Returns NULL when this module has no measurement with this id.
-        Measurement* getMeasurement(const char* id) const;
 
         Logger _log;
 
@@ -101,6 +116,9 @@ class BaseModule {
 
         Measurement** _measurements;
         unsigned int _measurementCount;
+        ConfigParameter** _configParameters;
+        unsigned int _parameterCount;
+
 };
 
 char* concat(const char* str1, const char* str2);

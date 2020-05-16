@@ -15,15 +15,22 @@ BaseModule::BaseModule(const char* id, unsigned long loopDelay, const char* mqtt
     _loopDelay = loopDelay;
     _lastLoopTime = 0;
     _measurementCount = 0;
+    _parameterCount = 0;
     _measurements = new Measurement*[MAX_MEASUREMENTS];
+    _configParameters = new ConfigParameter*[MAX_CONFIG_PARAMETERS];
     for (int i = 0; i < MAX_MEASUREMENTS; i++)
         _measurements[i] = NULL;
+    for (int i = 0; i < MAX_CONFIG_PARAMETERS; i++)
+        _configParameters[i] = NULL;
 }
 
 BaseModule::~BaseModule() {
     for (int i = 0; i < _measurementCount; i++)
-        delete _measurements[i];
+        if (_measurements[i]) delete _measurements[i];
     delete _measurements;
+    for (int i = 0; i < _parameterCount; i++)
+        if (_configParameters[i]) delete _configParameters[i];
+    delete _configParameters;
 }
 
 const char* BaseModule::getId() const {
@@ -71,10 +78,11 @@ void BaseModule::setLogger(const Logger &logger) {
 }
 
 void BaseModule::addMeasurement(Measurement* measurement) {
-
     _measurementCount++;
-    if (_measurementCount > MAX_MEASUREMENTS)
+    if (_measurementCount > MAX_MEASUREMENTS) {
+        _log.warning("Maximum amount of measurements exceeded. Increase MAX_MEASUREMENTS to fix this.");
         return;
+    }
 
     _measurements[_measurementCount-1] = measurement;
 }
@@ -87,6 +95,28 @@ Measurement* BaseModule::getMeasurement(const char* id) const {
     for (int i = 0; i < _measurementCount; i++) {
         if (strcmp(_measurements[i]->getId(), id) == 0)
             return _measurements[i];
+    }
+    return NULL;
+}
+
+void BaseModule::addConfigParameter(ConfigParameter* configParameter) {
+    _parameterCount++;
+    if (_parameterCount > MAX_CONFIG_PARAMETERS) {
+        _log.warning("Maximum amount of configuration parameters exceeded. Increase MAX_CONFIG_PARAMETERS to fix this.");
+        return;
+    }
+
+    _configParameters[_parameterCount-1] = configParameter;
+}
+
+ConfigParameter** BaseModule::getConfigParameters() const {
+    return _configParameters;
+}
+
+ConfigParameter* BaseModule::getConfigParameter(const char* id) const {
+    for (int i = 0; i < _parameterCount; i++) {
+        if (strcmp(_configParameters[i]->getId(), id) == 0)
+            return _configParameters[i];
     }
     return NULL;
 }

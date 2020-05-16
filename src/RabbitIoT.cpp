@@ -7,11 +7,13 @@ RabbitIot::RabbitIot(const char* deviceName, const Logger& logger) {
     _moduleCount = 0;
     _mqttClient = NULL;
     _webServer = NULL;
+    _configManager = NULL;
 }
 
 RabbitIot::~RabbitIot() {
     if (_mqttClient != NULL) delete _mqttClient;
     if (_webServer != NULL) delete _webServer;
+    if (_configManager != NULL) delete _configManager;
 
     for (int i = 0; i < _moduleCount; i++)
         delete _modules[i];
@@ -28,11 +30,12 @@ void RabbitIot::addModule(BaseModule* module){
 
 void RabbitIot::setup() {
     setupWifi();
-    setupMqtt();
 
     for (int i = 0; i < _moduleCount; i++)
         _modules[i]->setup();
 
+    setupConfiguration();
+    setupMqtt();
     setupWebServer();
 }
 
@@ -66,13 +69,20 @@ void RabbitIot::setupMqtt()
 {
     _logger.debug("Setting up MQTT client...");
     _mqttClient = new MqttClient(_deviceName, _logger);
-    _mqttClient->setup();
+    _mqttClient->setup(_configManager);
 }
 
 void RabbitIot::setupWebServer() {
     _logger.debug("Setting up WebServer...");
     _webServer = new WebServer(_logger);
     _webServer->setup(getDeviceName(), getMeasurements());
+}
+
+void RabbitIot::setupConfiguration() {
+    _logger.debug("Setting up configuration...");
+    _configManager = new ConfigManager(_logger);
+    _configManager->setup(getConfigParameters());
+    _configManager->loadParameters();
 }
 
 void RabbitIot::publishMeasurements(Measurement** measurements) {
@@ -100,5 +110,20 @@ Measurement** RabbitIot::getMeasurements() const {
     }
     measurements[index] = NULL;
     return measurements;
+}
+
+ConfigParameter** RabbitIot::getConfigParameters() const {
+    ConfigParameter** parameters = new ConfigParameter*[_moduleCount * MAX_CONFIG_PARAMETERS + 1];
+    int index = 0;
+    for (int i = 0; i < _moduleCount; i++) {
+        ConfigParameter** moduleParameters = _modules[i]->getConfigParameters();
+        int j = 0;
+        while (j < MAX_CONFIG_PARAMETERS && moduleParameters[j]) {
+            parameters[index++] = moduleParameters[j];
+            j++;
+        }
+    }
+    parameters[index] = NULL;
+    return parameters;
 }
 

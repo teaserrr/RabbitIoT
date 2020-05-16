@@ -8,6 +8,8 @@
 #include "Measurement.h"
 #include "MqttClient.h"
 #include "WebServer.h"
+#include "ConfigManager.h"
+#include "ConfigParameter.h"
 
 #ifndef MAX_MODULES
 #define MAX_MODULES 16
@@ -46,21 +48,30 @@ class RabbitIot {
         void loop();
     
         const char* getDeviceName() const { return _deviceName; }
-        
-        // Gets an array of all measurements of all modules.
-        // The size of the array may be larger than the amount of measurements. The last item in the array is always NULL.
-        Measurement** getMeasurements() const;
 
     protected:
         void setupWifi();
         void setupMqtt();
         void setupWebServer();
+        void setupConfiguration();
+        
+        // Gets an array of all measurements of all modules.
+        // The size of the array may be larger than the amount of measurements. The last item in the array is always NULL.
+        // It's the responsibility of the caller to delete the resulting array.
+        Measurement** getMeasurements() const;
+
+        // Gets an array of all configuration parameters of all modules.
+        // The size of the array may be larger than the amount of parameters. The last item in the array is always NULL.
+        // It's the responsibility of the caller to delete the resulting array.
+        ConfigParameter** getConfigParameters() const;
+
         void publishMeasurements(Measurement** measurements);
 
     private:
         Logger _logger;
         MqttClient* _mqttClient;
         WebServer* _webServer;
+        ConfigManager* _configManager;
         BaseModule* _modules[MAX_MODULES];
         const char* _deviceName;
         unsigned int _moduleCount;

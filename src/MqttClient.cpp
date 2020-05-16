@@ -22,12 +22,13 @@ MqttClient::~MqttClient() {
     }
 }
 
-void MqttClient::setup() {
+void MqttClient::setup(ConfigManager* configManager) {
     _wifiClient = new WiFiClient();
     _pubSubClient = new PubSubClient(*_wifiClient);
     _logger.debug("MQTT server: 192.168.0.180");
     _pubSubClient->setServer("192.168.0.180", 1883);
     _pubSubClient->setCallback(onMqttMessageReceived);
+    _configManager = configManager;
 }
 
 void MqttClient::loop()
@@ -70,10 +71,17 @@ bool MqttClient::reconnect()
 void MqttClient::createSubscriptions() {
 }
 
-void MqttClient::onMessageReceived(const String& topic, byte* payload, unsigned int length) {
+void MqttClient::onMessageReceived(const char* topic, byte* payload, unsigned int length) {
     char* cPayload = new char[length+1];
     strncpy(cPayload, (char*)payload, length);
-    _logger.log(LOGLEVEL_INFO, "Received MQTT message - topic: %s - length: %u - payload: %s", topic.c_str(), length, cPayload);
+    _logger.log(LOGLEVEL_INFO, "Received MQTT message - topic: %s - length: %u - payload: %s", topic, length, cPayload);
     
-    // TODO handle message
+    ConfigParameter* parameter = _configManager->getParameterByMqttTopic(topic);
+    if (!parameter) {
+      _logger.warning("No configuration parameter found for topic");
+      return;
+    }
+    _logger.debug("Update configuration parameter value");
+    parameter->setValue(cPayload);
+    _configManager->saveParameters();
 }
