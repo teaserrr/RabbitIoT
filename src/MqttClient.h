@@ -1,7 +1,6 @@
 #ifndef MqttClient_h
 #define MqttClient_h
 
-#include <WString.h>
 #include <PubSubClient.h>
 #include <WiFiClient.h>
 #include "Logger.h"
@@ -9,12 +8,12 @@
 
 class MqttClient {
     public:
-        MqttClient(const String& clientId, const Logger& logger = Logger());
+        MqttClient(const char* clientId, const Logger& logger = Logger());
         ~MqttClient();
 
         void setup(ConfigManager* configManager);
         void loop();
-        void publish(const String& topic, const String& payload);
+        void publish(const char* topic, const char* payload);
 
         static MqttClient* _instance;
 
@@ -28,7 +27,7 @@ class MqttClient {
         WiFiClient* _wifiClient;
         PubSubClient* _pubSubClient;
         ConfigManager* _configManager;
-        String _clientId;
+        const char* _clientId;
         unsigned long _lastMqttReconnectAttempt = 0;
 };
 

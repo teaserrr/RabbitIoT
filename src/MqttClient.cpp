@@ -6,7 +6,7 @@ void onMqttMessageReceived(char* topic, byte* payload, unsigned int length) {
     MqttClient::_instance->onMessageReceived(topic, payload, length);
 }
 
-MqttClient::MqttClient(const String& clientId, const Logger& logger) {
+MqttClient::MqttClient(const char* clientId, const Logger& logger) {
     _logger = logger;
     _clientId = clientId;
     _pubSubClient = NULL;
@@ -55,13 +55,13 @@ void MqttClient::loop()
   _pubSubClient->loop();
 }
 
-void MqttClient::publish(const String& topic, const String& payload) {
-    _pubSubClient->publish(topic.c_str(), payload.c_str());
+void MqttClient::publish(const char* topic, const char* payload) {
+    _pubSubClient->publish(topic, payload);
 }
 
 bool MqttClient::reconnect() 
 {
-  if (_pubSubClient->connect(_clientId.c_str())) {
+  if (_pubSubClient->connect(_clientId)) {
     _logger.info("MQTT connected");
     createSubscriptions();
   }
@@ -69,11 +69,19 @@ bool MqttClient::reconnect()
 }
 
 void MqttClient::createSubscriptions() {
+  ConfigParameter** parameters = _configManager->getParameters();
+  int i = 0;
+  while (parameters[i]) {
+    _pubSubClient->subscribe(parameters[i]->getMqttTopic());
+    i++;
+  }
 }
 
 void MqttClient::onMessageReceived(const char* topic, byte* payload, unsigned int length) {
     char* cPayload = new char[length+1];
     strncpy(cPayload, (char*)payload, length);
+    cPayload[length] = 0;
+
     _logger.log(LOGLEVEL_INFO, "Received MQTT message - topic: %s - length: %u - payload: %s", topic, length, cPayload);
     
     ConfigParameter* parameter = _configManager->getParameterByMqttTopic(topic);
@@ -84,4 +92,6 @@ void MqttClient::onMessageReceived(const char* topic, byte* payload, unsigned in
     _logger.debug("Update configuration parameter value");
     parameter->setValue(cPayload);
     _configManager->saveParameters();
+
+    delete cPayload;
 }

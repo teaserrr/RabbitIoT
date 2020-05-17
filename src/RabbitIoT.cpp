@@ -30,12 +30,15 @@ void RabbitIot::addModule(BaseModule* module){
 
 void RabbitIot::setup() {
     setupWifi();
-
+    delay(5000);
     for (int i = 0; i < _moduleCount; i++)
         _modules[i]->setup();
 
+    delay(1000);
     setupConfiguration();
+    delay(1000);
     setupMqtt();
+    delay(1000);
     setupWebServer();
 }
 

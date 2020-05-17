@@ -1,26 +1,42 @@
 #include "DarknessSensorModule.h"
 
-DarknessSensorModule::DarknessSensorModule(const char* id, uint8_t pin, unsigned long loopDelay, unsigned short threshold, unsigned short hysteresis, const char* mqttPath) 
-    : BaseModule(id, loopDelay, mqttPath, NULL, NULL) {
-    _threshold = threshold;
-    _hysteresis = hysteresis;
-    _state = NULL;
+#define ID_STATE "state"
+#define ID_THRESHOLD "threshold"
+#define ID_HYSTERESIS "hysteresis"
+
+DarknessSensorModule::DarknessSensorModule(const char* id, uint8_t pin, unsigned long loopDelay, unsigned short defaultThreshold, 
+                                            unsigned short defaultHysteresis, const char* baseMqttPath) 
+    : BaseModule(id, loopDelay, baseMqttPath, NULL, NULL) {
+    _dThreshold = defaultThreshold;
+    _dHysteresis = defaultHysteresis;
+    _mState = NULL;
+    _cThreshold = NULL;
+    _cHysteresis = NULL;
 }
 
 DarknessSensorModule::~DarknessSensorModule() {
-    if (_state != NULL) {
-        delete _state;
+    if (_mState != NULL) {
+        delete _mState;
+        // delete strings that were created with concat()
+        delete _mState->getMqttTopic();
+        delete _cThreshold->getMqttTopic();
+        delete _cHysteresis->getMqttTopic();
     }
 }
 
 void DarknessSensorModule::setup() {
     _log.debug("Setting up Darkness Sensor module...");
-    _state = new Measurement(_log, "state", "Darkness state", "", getMqttPath());
-    _log.debug("Add measurement...");
-    addMeasurement(_state);
-    _log.debug("set pinmode...");
     pinMode(_pin, INPUT);
-    _log.debug("Setup done.");
+
+    _mState = new Measurement(_log, ID_STATE, "Darkness state", "", concat(getMqttPath(), ID_STATE));
+    addMeasurement(_mState);
+    
+    _cThreshold = new ConfigParameter(ID_THRESHOLD, "Darkness threshold", _dThreshold, concat(getMqttPath(), ID_THRESHOLD));
+    _cHysteresis = new ConfigParameter(ID_HYSTERESIS, "Darkness hysteresis", _dHysteresis, concat(getMqttPath(), ID_HYSTERESIS));
+    addConfigParameter(_cThreshold);
+    addConfigParameter(_cHysteresis);
+
+    _log.debug("DarknessSensorModule setup done.");
 }
 
 void DarknessSensorModule::loopInner() {
@@ -28,17 +44,17 @@ void DarknessSensorModule::loopInner() {
     bool newState;
 
     if (isDarkness()) {
-        newState = lightValue <= _threshold + _hysteresis;
+        newState = lightValue <= _cThreshold->getIntValue() + _cHysteresis->getIntValue();
     }
     else {
-        newState = lightValue <= _threshold;
+        newState = lightValue <= _cThreshold->getIntValue();
     }
     
     _log.log(LOGLEVEL_DEBUG, "light value: %u - state: %s", lightValue, newState ? "darkness" : "light");
 
-    _state->updateValue(BoolData(newState));
+    _mState->updateValue(BoolData(newState));
 }
 
 bool DarknessSensorModule::isDarkness() {
-    return _state && _state->data() && ((BoolData*)_state->data())->value();
+    return _mState && _mState->data() && ((BoolData*)_mState->data())->value();
 }

@@ -10,10 +10,13 @@
  * when the switch between dark and light is made. 
  * 
  * This module has 1 measurement:
- * - state: boolean value (unitless)
+ * - state: boolean value (unitless). The value of this measurement will be published as a topic with the specified path. 
+ *          Darkness will be published as "1", light as "0".
  * 
- * The value of this measurement will be published as a topic with the specified path. 
- * Darkness will be published as "1", light as "0".
+ * Configuration parameters:
+ * - threshold: determines when to switch between darkness and light. Sensor values smaller than or equal to the threshold are considered darkness.
+ * - hysteresis: allows to add some 'delay' before switching back from darkness to light. When the state is darkness, this value is added to the
+ *               threshold; the state will only switch back to light if the sensor value is greater than threshold + hysteresis
  * 
  * The loopDelay determines how often the light value is measured and darkness state is evaluated.
  */
@@ -24,13 +27,12 @@ class DarknessSensorModule : public BaseModule {
          * - id: module id
          * - pin: pin number of an analog input pin (default 17 = A0)
          * - loopDelay: determines how often the light value is measured and darkness state is evaluated
-         * - threshold: determines when to switch between darkness and light. Sensor values smaller than or equal to the threshold are considered darkness.
-         * - hysteresis: allows to add some 'delay' before switching back from darkness to light. When the state is darkness, this value is added to the
-         *               threshold; the state will only switch back to light if the sensor value is greater than threshold + hysteresis
-         * - mqttPath: path used to publish the state topic
+         * - defaultThreshold: default value for the threshold setting
+         * - hysteresis: default value for the hysteresis setting
+         * - baseMqttPath: base MQTT path used to publish the state and subscribe to the configuration settings
          */
-        DarknessSensorModule(const char* id, uint8_t pin = 17 /* A0 */, unsigned long loopDelay = 1000, unsigned short threshold = 400, unsigned short hysteresis = 0, 
-                             const char* mqttPath = NULL);
+        DarknessSensorModule(const char* id, uint8_t pin = 17 /* A0 */, unsigned long loopDelay = 1000, unsigned short defaultThreshold = 400, unsigned short defaultHysteresis = 0, 
+                             const char* baseMqttPath = NULL);
         ~DarknessSensorModule();
 
         virtual void setup();
@@ -41,10 +43,12 @@ class DarknessSensorModule : public BaseModule {
         virtual void loopInner();
         
     private:
-        Measurement* _state;
+        Measurement* _mState;
+        ConfigParameter* _cThreshold;
+        ConfigParameter* _cHysteresis;
+        unsigned short _dThreshold;
+        unsigned short _dHysteresis;
         uint8_t _pin;
-        unsigned short _threshold;
-        unsigned short _hysteresis;
 };
 
 #endif

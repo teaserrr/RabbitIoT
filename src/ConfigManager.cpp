@@ -38,15 +38,21 @@ void ConfigManager::loadParameters() {
     }
 
     _log.debug("  deserializing json");
-    DynamicJsonDocument doc(configFile.size());
+    int capacity = _jsonSize;
+    DynamicJsonDocument doc(capacity);
     DeserializationError error = deserializeJson(doc, configFile);
+    while (error) {
+        _log.error("Failed to deserialize json:");
+        _log.error(error.c_str());
+        if (error != DeserializationError::NoMemory || doc.capacity() == 0) // capacity 0 means allocation failed
+            break;
+        capacity += 128;
+        doc = DynamicJsonDocument(capacity);
+        error = deserializeJson(doc, configFile);
+    }
     if (!error) {
         _log.debug("  deserialized json");
         loadParameters(doc);
-    }
-    else {
-        _log.error("Failed to deserialize json:");
-        _log.error(error.c_str());
     }
     configFile.close();    
 }
@@ -57,6 +63,7 @@ void ConfigManager::loadParameters(const DynamicJsonDocument& document) {
         const char* paramId = _parameters[i]->getId();
         const char* value = document[paramId];
         if (value) {
+            _log.log(LOGLEVEL_INFO, "Init config parameter %s to value %s", paramId, value);
            _parameters[i]->setValue(value); 
         }
         i++;
@@ -72,6 +79,7 @@ void ConfigManager::saveParameters() {
     DynamicJsonDocument document(_jsonSize);
     int i = 0;
     while (_parameters[i]) {
+        _log.log(LOGLEVEL_DEBUG, "Save config parameter %s with value %s", _parameters[i]->getId(), _parameters[i]->getValue());
         document[_parameters[i]->getId()] = _parameters[i]->getValue();
         i++;
     }
@@ -94,6 +102,7 @@ ConfigParameter* ConfigManager::getParameterByMqttTopic(const char* mqttTopic) {
             return _parameters[i];
         i++;
     }
+    _log.log(LOGLEVEL_WARNING, "Config parameter for topic %s not found", mqttTopic);
     return NULL;
 }
 

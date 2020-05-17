@@ -19,6 +19,7 @@ class ConfigManager {
         void loadParameters();
         void saveParameters();
 
+        ConfigParameter** getParameters() { return _parameters; }
         ConfigParameter* getParameterByMqttTopic(const char* mqttTopic);
 
     private:

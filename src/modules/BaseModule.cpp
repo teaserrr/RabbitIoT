@@ -40,6 +40,7 @@ const char* BaseModule::getId() const {
 bool BaseModule::isEnabled() const {
     return _enabled;
 }
+
 const char* BaseModule::getMqttPath() const { 
     return _mqttPath; 
 }

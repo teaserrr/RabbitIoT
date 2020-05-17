@@ -1,12 +1,14 @@
 #include <RabbitIoT.h>
 #include <modules/DarknessSensorModule.h>
 
+#define ANALOG_PIN 17
+
 Logger logger(LOGLEVEL_TRACE);
 RabbitIot rabbit("testRabbit", logger);
 
 void setup() {
     delay(3000);
-    DarknessSensorModule* module = new DarknessSensorModule("darkness", 17, 1000, 400, 200, "sensors/darkness");
+    DarknessSensorModule* module = new DarknessSensorModule("darkness", ANALOG_PIN, 3000, 400, 200, "sensors/darkness/");
     rabbit.addModule(module);
     rabbit.setup();
 }
