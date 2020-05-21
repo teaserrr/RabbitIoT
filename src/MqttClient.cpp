@@ -6,9 +6,11 @@ void onMqttMessageReceived(char* topic, byte* payload, unsigned int length) {
     MqttClient::_instance->onMessageReceived(topic, payload, length);
 }
 
-MqttClient::MqttClient(const char* clientId, const Logger& logger) {
+MqttClient::MqttClient(const Logger& logger, const char* clientId, const char* host, uint16_t port) {
     _logger = logger;
     _clientId = clientId;
+    _host = host;
+    _port = port;
     _pubSubClient = NULL;
     _wifiClient = NULL;
     _lastMqttReconnectAttempt = 0;
@@ -22,59 +24,79 @@ MqttClient::~MqttClient() {
     }
 }
 
-void MqttClient::setup(ConfigManager* configManager) {
-    _wifiClient = new WiFiClient();
-    _pubSubClient = new PubSubClient(*_wifiClient);
-    _logger.debug(PSTR("MQTT server: 192.168.0.180"));
-    _pubSubClient->setServer("192.168.0.180", 1883);
-    _pubSubClient->setCallback(onMqttMessageReceived);
+void MqttClient::setup() {
+    _cHost = new ConfigParameter("host", "MQTT host", _host, 32, NULL);
+    _cPort = new ConfigParameter("port", "MQTT port", _port, NULL);
+}
+
+void MqttClient::setConfigManager(ConfigManager* configManager) {
     _configManager = configManager;
+}
+
+void MqttClient::createClient() {
+    if (!strlen(_cHost->getValue()) || !_cPort->getIntValue())
+        return;
+
+    if (!_wifiClient)
+        _wifiClient = new WiFiClient();
+    
+    if (_pubSubClient)
+        delete _pubSubClient;
+
+    _pubSubClient = new PubSubClient(*_wifiClient);
+    _logger.log(LOGLEVEL_INFO, PSTR("MQTT server: %s - port: %u"), _cHost->getValue(), _cPort->getIntValue());
+    _pubSubClient->setServer(_cHost->getValue(), _cPort->getIntValue());
+    _pubSubClient->setCallback(onMqttMessageReceived);
 }
 
 void MqttClient::loop()
 {
-  if (!_pubSubClient->connected()) 
-  {
-    if (_lastMqttReconnectAttempt == 0)
-      _logger.warning(PSTR("MQTT disconnected"));
-      
-    if (millis() - _lastMqttReconnectAttempt > 5000) 
+    if (!_pubSubClient) createClient();
+    if (!_pubSubClient) return;
+
+    if (!_pubSubClient->connected()) 
     {
-      _lastMqttReconnectAttempt = millis();
-      _logger.debug(PSTR("attempt MQTT reconnect"));
-      if (reconnect()) 
-      {
-        _lastMqttReconnectAttempt = 0;
-      }
-      else 
-      {
-        _logger.warning(PSTR("MQTT reconnect failed"));
-      }
+        if (_lastMqttReconnectAttempt == 0)
+            _logger.warning(PSTR("MQTT disconnected"));
+
+        if (millis() - _lastMqttReconnectAttempt > 5000) 
+        {
+            _lastMqttReconnectAttempt = millis();
+            _logger.debug(PSTR("attempt MQTT reconnect"));
+            if (reconnect()) 
+            {
+                _lastMqttReconnectAttempt = 0;
+            }
+            else 
+            {
+                _logger.warning(PSTR("MQTT reconnect failed"));
+            }
+        }
     }
-  }
-  _pubSubClient->loop();
+    _pubSubClient->loop();
 }
 
 void MqttClient::publish(const char* topic, const char* payload) {
+    if (!_pubSubClient) return;
     _pubSubClient->publish(topic, payload);
 }
 
 bool MqttClient::reconnect() 
 {
-  if (_pubSubClient->connect(_clientId)) {
-    _logger.info(PSTR("MQTT connected"));
-    createSubscriptions();
-  }
-  return _pubSubClient->connected();
+    if (_pubSubClient->connect(_clientId)) {
+        _logger.info(PSTR("MQTT connected"));
+        createSubscriptions();
+    }
+    return _pubSubClient->connected();
 }
 
 void MqttClient::createSubscriptions() {
-  ConfigParameter** parameters = _configManager->getParameters();
-  int i = 0;
-  while (parameters[i]) {
-    _pubSubClient->subscribe(parameters[i]->getMqttTopic());
-    i++;
-  }
+    ConfigParameter** parameters = _configManager->getParameters();
+    int i = 0;
+    while (parameters[i]) {
+        _pubSubClient->subscribe(parameters[i]->getMqttTopic());
+        i++;
+    }
 }
 
 void MqttClient::onMessageReceived(const char* topic, byte* payload, unsigned int length) {
@@ -86,8 +108,8 @@ void MqttClient::onMessageReceived(const char* topic, byte* payload, unsigned in
     
     ConfigParameter* parameter = _configManager->getParameterByMqttTopic(topic);
     if (!parameter) {
-      _logger.warning(PSTR("No configuration parameter found for topic"));
-      return;
+        _logger.warning(PSTR("No configuration parameter found for topic"));
+        return;
     }
     _logger.debug(PSTR("Update configuration parameter value"));
     parameter->setValue(cPayload);

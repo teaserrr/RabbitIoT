@@ -35,7 +35,7 @@ class RabbitIot {
          * - deviceName: the name of your IoT device. This is displayed in the web interface and is used by the MQTT client.
          * - logger: the default logger implementation logs to Serial output with log level WARNING.
          */
-        RabbitIot(const char* deviceName, const Logger& logger = Logger());
+        RabbitIot(const char* deviceName, const char* mqttHost=NULL, const Logger& logger = Logger());
         ~RabbitIot();
 
         // call this to add modules to the device, BEFORE you call setup()
@@ -74,6 +74,7 @@ class RabbitIot {
         ConfigManager* _configManager;
         BaseModule* _modules[MAX_MODULES];
         const char* _deviceName;
+        const char* _mqttHost;
         unsigned int _moduleCount;
 };
 

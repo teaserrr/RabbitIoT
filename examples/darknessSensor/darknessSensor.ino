@@ -4,7 +4,7 @@
 #define ANALOG_PIN 17
 
 Logger logger(LOGLEVEL_TRACE);
-RabbitIot rabbit("testRabbit", logger);
+RabbitIot rabbit("testRabbit", "192.168.0.180", logger);
 
 void setup() {
     DarknessSensorModule* module = new DarknessSensorModule("darkness", ANALOG_PIN, 3000, 400, 200, "sensors/darkness/");

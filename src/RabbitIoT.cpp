@@ -2,10 +2,11 @@
 #include <WiFiManager.h>
 #include <WString.h>
 
-RabbitIot::RabbitIot(const char* deviceName, const Logger& logger) {
+RabbitIot::RabbitIot(const char* deviceName, const char* mqttHost, const Logger& logger) {
     _deviceName = deviceName;
     _logger = logger;
     _moduleCount = 0;
+    _mqttHost = mqttHost;
     _mqttClient = NULL;
     _webServer = NULL;
     _configManager = NULL;
@@ -36,8 +37,8 @@ void RabbitIot::setup() {
     for (int i = 0; i < _moduleCount; i++)
         _modules[i]->setup();
 
-    setupConfiguration();
     setupMqtt();
+    setupConfiguration();
     setupWebServer();
 }
 
@@ -70,8 +71,8 @@ void RabbitIot::setupWifi() {
 void RabbitIot::setupMqtt()
 {
     _logger.debug(PSTR("Setting up MQTT client..."));
-    _mqttClient = new MqttClient(_deviceName, _logger);
-    _mqttClient->setup(_configManager);
+    _mqttClient = new MqttClient(_logger, _deviceName, _mqttHost);
+    _mqttClient->setup();
 }
 
 void RabbitIot::setupWebServer() {
@@ -85,6 +86,7 @@ void RabbitIot::setupConfiguration() {
     _configManager = new ConfigManager(_logger);
     _configManager->setup(getConfigParameters());
     _configManager->loadParameters();
+    _mqttClient->setConfigManager(_configManager);
 }
 
 void RabbitIot::publishMeasurements(Measurement** measurements) {

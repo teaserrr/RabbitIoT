@@ -3,6 +3,7 @@
 
 Logger logger(LOGLEVEL_DEBUG);
 RabbitIot rabbit("testRabbit", logger);
+RabbitIot rabbit("testRabbit", "192.168.0.180", logger);
 
 void setup() {
     delay(3000);
