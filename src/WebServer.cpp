@@ -29,7 +29,7 @@ void WebServer::setup(const char* deviceName, Measurement** measurements) {
     addUriHandler("/", serverHandleRoot);
 
     _server->begin();
-    _logger.info("Web server started");
+    _logger.info(PSTR("Web server started"));
 }
 
 void WebServer::loop() {
@@ -37,20 +37,20 @@ void WebServer::loop() {
 }
 
 void WebServer::handleRoot() {
-    _logger.info("WebServer handle root");
+    _logger.info(PSTR("WebServer handle root"));
 
     String html = FPSTR(RABBIT_HTTP_HEADER);
     html += FPSTR(RABBIT_HTTP_STYLE);
     html += FPSTR(RABBIT_HTTP_BODY);
-    html.replace("{device}", _deviceName);
+    html.replace(F("{device}"), _deviceName);
     html += FPSTR(RABBIT_HTTP_TABLE);
 
     int i = 0;
     while (_measurements[i]) {
         String tempHtml = FPSTR(RABBIT_HTTP_ITEM);
-        tempHtml.replace("{key}", _measurements[i]->getDescription());
-        tempHtml.replace("{value}", _measurements[i]->getStringValue());
-        tempHtml.replace("{unit}", _measurements[i]->getUnit());
+        tempHtml.replace(F("{key}"), _measurements[i]->getDescription());
+        tempHtml.replace(F("{value}"), _measurements[i]->getStringValue());
+        tempHtml.replace(F("{unit}"), _measurements[i]->getUnit());
         html += tempHtml;
         i++;
     }
@@ -58,5 +58,5 @@ void WebServer::handleRoot() {
     html += FPSTR(RABBIT_HTTP_LINK_BUTTON);
     html += FPSTR(RABBIT_HTTP_END);
     
-    _server->send(200, "text/html", html); 
+    _server->send(200, F("text/html"), html); 
 }

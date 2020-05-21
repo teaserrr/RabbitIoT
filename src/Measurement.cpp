@@ -20,13 +20,13 @@ Measurement::~Measurement() {
 }
 
 void Measurement::updateValue(const BaseData& value) {
-    _log.log(LOGLEVEL_TRACE, "%s updateValue: %s - currentValue: %s", _id, value.stringValue(), _data ? _data->stringValue() : "NULL");
+    _log.log(LOGLEVEL_TRACE, PSTR("%s updateValue: %s - currentValue: %s"), _id, value.stringValue(), _data ? _data->stringValue() : "NULL");
     if (!_data || !_data->equals(value)) { 
         if (_data) delete _data;
         _data = value.copy();
         updateTimestamp();
         setUpdated();
-        _log.log(LOGLEVEL_TRACE, "%s updateValue - updated", _id);
+        _log.log(LOGLEVEL_TRACE, PSTR("%s updateValue - updated"), _id);
     }
 }
 

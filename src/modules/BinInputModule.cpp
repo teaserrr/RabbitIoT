@@ -13,15 +13,15 @@ BinInputModule::~BinInputModule() {
 }
 
 void BinInputModule::setup() {
-    _log.debug("Setting up Binary input module...");
     _state = new Measurement(_log, "state", "Input state", "", getMqttPath());
+    _log.debug(PSTR("Setting up Binary input module..."));
     addMeasurement(_state);
     pinMode(_pin, INPUT);
 }
 
 void BinInputModule::loopInner() {
     bool newState = digitalRead(_pin);
-    _log.log(LOGLEVEL_DEBUG, "state: %s", newState ? "high" : "low");
+    _log.log(LOGLEVEL_DEBUG, PSTR("state: %s"), newState ? PSTR("high") : PSTR("low"));
 
     _state->updateValue(BoolData(newState));
 }

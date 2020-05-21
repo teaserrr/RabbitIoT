@@ -1,14 +1,14 @@
 #ifndef HtmlDefines_h
 #define HtmlDefines_h
 
-const char RABBIT_HTTP_HEADER[] = 
+const char RABBIT_HTTP_HEADER[] PROGMEM = 
 "<!DOCTYPE html>" \
 "<html lang=\"en\">" \
 "  <head>" \
 "    <meta charset=\"UTF-8\">" \
 "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1, user-scalable=no\"/>" \
 "    <title>{device}</title>";
-const char RABBIT_HTTP_STYLE[] = 
+const char RABBIT_HTTP_STYLE[] PROGMEM = 
 "   <style>" \
 "   body { font-family: \"Helvetica Neue\", Helvetica, Arial; font-size: 14px; line-height: 20px; font-weight: 400; color: #f6f6f6; background: #2b2b2b; }" \
 "   .wrapper { margin: auto; padding: 40px; }" \
@@ -25,27 +25,27 @@ const char RABBIT_HTTP_STYLE[] =
 "   .button.blue { background: #2980b9; }" \
 "   @media screen and (max-width: 550px) { .button {width: 100%; } }" \
 "   </style>";
-const char RABBIT_HTTP_BODY[] = 
+const char RABBIT_HTTP_BODY[] PROGMEM = 
 "  </head>" \
 "  <body>" \
 "    <h1>{device}</h1>" \
 "    <div class=\"wrapper\">";
-const char RABBIT_HTTP_TABLE[] =
+const char RABBIT_HTTP_TABLE[] PROGMEM =
 "      <div class=\"table\">" \
 "        <div class=\"row header\">" \
 "          <div class=\"cell\">Sensor data</div>" \
 "          <div class=\"cell\"></div>" \
 "        </div>";
-const char RABBIT_HTTP_ITEM[] = 
+const char RABBIT_HTTP_ITEM[] PROGMEM = 
 "        <div class=\"row\">" \
 "          <div class=\"cell\">{key}:</div>" \
 "          <div class=\"cell\">{value}{unit}</div>" \
 "        </div>";
-const char RABBIT_HTTP_TABLE_END[] =
+const char RABBIT_HTTP_TABLE_END[] PROGMEM =
 "      </div>";
-const char RABBIT_HTTP_LINK_BUTTON[] =
+const char RABBIT_HTTP_LINK_BUTTON[] PROGMEM =
 "      <a class=\"button\" href=\"configuration\">Configuration</a>";
-const char RABBIT_HTTP_END[] = 
+const char RABBIT_HTTP_END[] PROGMEM = 
 "    </div>" \
 "  </body>" \
 "</html>";

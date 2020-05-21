@@ -1,5 +1,6 @@
 #include "RabbitIoT.h"
 #include <WiFiManager.h>
+#include <WString.h>
 
 RabbitIot::RabbitIot(const char* deviceName, const Logger& logger) {
     _deviceName = deviceName;
@@ -55,32 +56,32 @@ void RabbitIot::loop() {
 void RabbitIot::setupWifi() {
     WiFiManager wifiManager;
 #ifndef WIFI_CONFIG_PORTAL
-    _logger.info("Starting WiFiManager autoconnect...");
+    _logger.info(PSTR("Starting WiFiManager autoconnect..."));
     wifiManager.setDebugOutput(false);
     wifiManager.autoConnect();
 #else
-    _logger.info("Starting WiFiManager config portal...");
-    wifiManager.startConfigPortal("OnDemandAP");
+    _logger.info(PSTR("Starting WiFiManager config portal..."));
+    wifiManager.startConfigPortal(PSTR("OnDemandAP"));
 #endif
-    _logger.log(LOGLEVEL_INFO, "Connected to: %s", WiFi.SSID().c_str());
-    _logger.log(LOGLEVEL_INFO, "IP address: %s", WiFi.localIP().toString().c_str());
+    _logger.log(LOGLEVEL_INFO, PSTR("Connected to: %s"), WiFi.SSID().c_str());
+    _logger.log(LOGLEVEL_INFO, PSTR("IP address: %s"), WiFi.localIP().toString().c_str());
 }
 
 void RabbitIot::setupMqtt()
 {
-    _logger.debug("Setting up MQTT client...");
+    _logger.debug(PSTR("Setting up MQTT client..."));
     _mqttClient = new MqttClient(_deviceName, _logger);
     _mqttClient->setup(_configManager);
 }
 
 void RabbitIot::setupWebServer() {
-    _logger.debug("Setting up WebServer...");
+    _logger.debug(PSTR("Setting up WebServer..."));
     _webServer = new WebServer(_logger);
     _webServer->setup(getDeviceName(), getMeasurements());
 }
 
 void RabbitIot::setupConfiguration() {
-    _logger.debug("Setting up configuration...");
+    _logger.debug(PSTR("Setting up configuration..."));
     _configManager = new ConfigManager(_logger);
     _configManager->setup(getConfigParameters());
     _configManager->loadParameters();
@@ -90,7 +91,7 @@ void RabbitIot::publishMeasurements(Measurement** measurements) {
     int i = 0;
     while (i < MAX_MEASUREMENTS && measurements[i]) {
         if (measurements[i]->shouldPublish()) {
-            _logger.log(LOGLEVEL_DEBUG, "Publish measurement: %s value: %s", measurements[i]->getId(), measurements[i]->getStringValue());
+            _logger.log(LOGLEVEL_DEBUG, PSTR("Publish measurement: %s value: %s"), measurements[i]->getId(), measurements[i]->getStringValue());
             _mqttClient->publish(measurements[i]->getMqttTopic(), measurements[i]->getStringValue());
             measurements[i]->setPublished();
         }

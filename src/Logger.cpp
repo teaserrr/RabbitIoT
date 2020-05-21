@@ -50,7 +50,7 @@ Logger::Logger(int logLevel, int baudRate) {
 
 void Logger::init() {
     Serial.begin(_baudRate);
-    log(_logLevel, "Logger init - baudrate = %u, log level = %u", _baudRate, _logLevel);
+    log(_logLevel, PSTR("Logger init - baudrate = %u, log level = %u"), _baudRate, _logLevel);
 }
 
 void Logger::trace(const char* message) {

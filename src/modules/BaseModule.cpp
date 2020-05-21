@@ -81,7 +81,7 @@ void BaseModule::setLogger(const Logger &logger) {
 void BaseModule::addMeasurement(Measurement* measurement) {
     _measurementCount++;
     if (_measurementCount > MAX_MEASUREMENTS) {
-        _log.warning("Maximum amount of measurements exceeded. Increase MAX_MEASUREMENTS to fix this.");
+        _log.warning(PSTR("Maximum amount of measurements exceeded. Increase MAX_MEASUREMENTS to fix this."));
         return;
     }
 
@@ -103,7 +103,7 @@ Measurement* BaseModule::getMeasurement(const char* id) const {
 void BaseModule::addConfigParameter(ConfigParameter* configParameter) {
     _parameterCount++;
     if (_parameterCount > MAX_CONFIG_PARAMETERS) {
-        _log.warning("Maximum amount of configuration parameters exceeded. Increase MAX_CONFIG_PARAMETERS to fix this.");
+        _log.warning(PSTR("Maximum amount of configuration parameters exceeded. Increase MAX_CONFIG_PARAMETERS to fix this."));
         return;
     }
 

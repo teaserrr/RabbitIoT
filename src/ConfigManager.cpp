@@ -8,9 +8,9 @@ ConfigManager::ConfigManager(const Logger& logger) {
     _parameters = NULL;
 
 	if (!SPIFFS.begin()) 
-        _log.error("Failed to mount file system");
+        _log.error(PSTR("Failed to mount file system"));
     else
-        _log.debug("Mounted file system");
+        _log.debug(PSTR("Mounted file system"));
 }
 
 ConfigManager::~ConfigManager() {
@@ -23,26 +23,26 @@ void ConfigManager::setup(ConfigParameter** parameters) {
 }
 
 void ConfigManager::loadParameters() {
-    _log.info("Loading configuration parameters");
+    _log.info(PSTR("Loading configuration parameters"));
 
     if (!SPIFFS.exists(CONFIG_FILE_PATH)) {
-        _log.info("Config file does not exist: " CONFIG_FILE_PATH);
+        _log.info(PSTR("Config file does not exist: " CONFIG_FILE_PATH));
         return;
     }
 
-    _log.debug("  opening config file");
+    _log.debug(PSTR("  opening config file"));
     File configFile = SPIFFS.open(CONFIG_FILE_PATH, "r");
     if (!configFile) {
-        _log.error("Failed to open config file");
+        _log.error(PSTR("Failed to open config file"));
         return;
     }
 
-    _log.debug("  deserializing json");
+    _log.debug(PSTR("  deserializing json"));
     int capacity = _jsonSize;
     DynamicJsonDocument doc(capacity);
     DeserializationError error = deserializeJson(doc, configFile);
     while (error) {
-        _log.error("Failed to deserialize json:");
+        _log.error(PSTR("Failed to deserialize json:"));
         _log.error(error.c_str());
         if (error != DeserializationError::NoMemory || doc.capacity() == 0) // capacity 0 means allocation failed
             break;
@@ -51,7 +51,7 @@ void ConfigManager::loadParameters() {
         error = deserializeJson(doc, configFile);
     }
     if (!error) {
-        _log.debug("  deserialized json");
+        _log.debug(PSTR("  deserialized json"));
         loadParameters(doc);
     }
     configFile.close();    
@@ -63,7 +63,7 @@ void ConfigManager::loadParameters(const DynamicJsonDocument& document) {
         const char* paramId = _parameters[i]->getId();
         const char* value = document[paramId];
         if (value) {
-            _log.log(LOGLEVEL_INFO, "Init config parameter %s to value %s", paramId, value);
+            _log.log(LOGLEVEL_INFO, PSTR("Init config parameter %s to value %s"), paramId, value);
            _parameters[i]->setValue(value); 
         }
         i++;
@@ -71,7 +71,7 @@ void ConfigManager::loadParameters(const DynamicJsonDocument& document) {
 }
 
 void ConfigManager::saveParameters() {
-    _log.info("Saving configuration parameters");
+    _log.info(PSTR("Saving configuration parameters"));
 
     if (!_parameters[0])
         return; // no parameters
@@ -79,18 +79,18 @@ void ConfigManager::saveParameters() {
     DynamicJsonDocument document(_jsonSize);
     int i = 0;
     while (_parameters[i]) {
-        _log.log(LOGLEVEL_DEBUG, "Save config parameter %s with value %s", _parameters[i]->getId(), _parameters[i]->getValue());
+        _log.log(LOGLEVEL_DEBUG, PSTR("Save config parameter %s with value %s"), _parameters[i]->getId(), _parameters[i]->getValue());
         document[_parameters[i]->getId()] = _parameters[i]->getValue();
         i++;
     }
 
-    _log.debug("  opening config file");
+    _log.debug(PSTR("  opening config file"));
     File configFile = SPIFFS.open(CONFIG_FILE_PATH, "w");
     if (!configFile) {
-        _log.error("Failed to open config file for writing");
+        _log.error(PSTR("Failed to open config file for writing"));
     }
 
-    _log.debug("  serializing json");
+    _log.debug(PSTR("  serializing json"));
     serializeJson(document, configFile);
     configFile.close();
 }
@@ -102,7 +102,7 @@ ConfigParameter* ConfigManager::getParameterByMqttTopic(const char* mqttTopic) {
             return _parameters[i];
         i++;
     }
-    _log.log(LOGLEVEL_WARNING, "Config parameter for topic %s not found", mqttTopic);
+    _log.log(LOGLEVEL_WARNING, PSTR("Config parameter for topic %s not found"), mqttTopic);
     return NULL;
 }
 

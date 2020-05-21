@@ -25,7 +25,7 @@ MqttClient::~MqttClient() {
 void MqttClient::setup(ConfigManager* configManager) {
     _wifiClient = new WiFiClient();
     _pubSubClient = new PubSubClient(*_wifiClient);
-    _logger.debug("MQTT server: 192.168.0.180");
+    _logger.debug(PSTR("MQTT server: 192.168.0.180"));
     _pubSubClient->setServer("192.168.0.180", 1883);
     _pubSubClient->setCallback(onMqttMessageReceived);
     _configManager = configManager;
@@ -36,19 +36,19 @@ void MqttClient::loop()
   if (!_pubSubClient->connected()) 
   {
     if (_lastMqttReconnectAttempt == 0)
-      _logger.warning("MQTT disconnected");
+      _logger.warning(PSTR("MQTT disconnected"));
       
     if (millis() - _lastMqttReconnectAttempt > 5000) 
     {
       _lastMqttReconnectAttempt = millis();
-      _logger.debug("attempt MQTT reconnect");
+      _logger.debug(PSTR("attempt MQTT reconnect"));
       if (reconnect()) 
       {
         _lastMqttReconnectAttempt = 0;
       }
       else 
       {
-        _logger.warning("MQTT reconnect failed");
+        _logger.warning(PSTR("MQTT reconnect failed"));
       }
     }
   }
@@ -62,7 +62,7 @@ void MqttClient::publish(const char* topic, const char* payload) {
 bool MqttClient::reconnect() 
 {
   if (_pubSubClient->connect(_clientId)) {
-    _logger.info("MQTT connected");
+    _logger.info(PSTR("MQTT connected"));
     createSubscriptions();
   }
   return _pubSubClient->connected();
@@ -82,14 +82,14 @@ void MqttClient::onMessageReceived(const char* topic, byte* payload, unsigned in
     strncpy(cPayload, (char*)payload, length);
     cPayload[length] = 0;
 
-    _logger.log(LOGLEVEL_INFO, "Received MQTT message - topic: %s - length: %u - payload: %s", topic, length, cPayload);
+    _logger.log(LOGLEVEL_INFO, PSTR("Received MQTT message - topic: %s - length: %u - payload: %s"), topic, length, cPayload);
     
     ConfigParameter* parameter = _configManager->getParameterByMqttTopic(topic);
     if (!parameter) {
-      _logger.warning("No configuration parameter found for topic");
+      _logger.warning(PSTR("No configuration parameter found for topic"));
       return;
     }
-    _logger.debug("Update configuration parameter value");
+    _logger.debug(PSTR("Update configuration parameter value"));
     parameter->setValue(cPayload);
     _configManager->saveParameters();
 
