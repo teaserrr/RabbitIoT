@@ -35,8 +35,8 @@ void copyLevelString(char* bufPtr, int level) {
 
 Logger::Logger(int logLevel, int baudRate) {
     _logLevel = logLevel;
-    Serial.begin(baudRate);
-  
+    _baudRate = baudRate;
+    
     // 01234567890123456789
     // [1234567890] [LVL] messsage
     _logbuf[0] = '[';
@@ -46,6 +46,11 @@ Logger::Logger(int logLevel, int baudRate) {
     _logbuf[17] = ']';
     _logbuf[18] = ' ';
     _logbuf[LOGBUF_SIZE-1] = 0;
+}
+
+void Logger::init() {
+    Serial.begin(_baudRate);
+    log(_logLevel, "Logger init - baudrate = %u, log level = %u", _baudRate, _logLevel);
 }
 
 void Logger::trace(const char* message) {

@@ -7,7 +7,6 @@ Logger logger(LOGLEVEL_TRACE);
 RabbitIot rabbit("testRabbit", logger);
 
 void setup() {
-    delay(3000);
     DarknessSensorModule* module = new DarknessSensorModule("darkness", ANALOG_PIN, 3000, 400, 200, "sensors/darkness/");
     rabbit.addModule(module);
     rabbit.setup();

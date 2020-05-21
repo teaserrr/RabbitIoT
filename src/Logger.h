@@ -23,6 +23,8 @@ class Logger {
     public:
         Logger(int logLevel = DEFAULT_LOGLEVEL, int baudRate = DEFAULT_BAUDRATE);
 
+        void init();
+
         void trace(const char* message);
         void debug(const char* message);
         void info(const char* message);
@@ -32,6 +34,7 @@ class Logger {
     
     private:
         int _logLevel;
+        int _baudRate;
         char _logbuf[LOGBUF_SIZE];
 };
 

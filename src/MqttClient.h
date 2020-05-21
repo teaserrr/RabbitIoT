@@ -8,7 +8,7 @@
 
 class MqttClient {
     public:
-        MqttClient(const char* clientId, const Logger& logger = Logger());
+        MqttClient(const char* clientId, const Logger& logger);
         ~MqttClient();
 
         void setup(ConfigManager* configManager);
