@@ -78,7 +78,7 @@ void RabbitIot::setupMqtt()
 void RabbitIot::setupWebServer() {
     _logger.debug(PSTR("Setting up WebServer..."));
     _webServer = new WebServer(_logger);
-    _webServer->setup(getDeviceName(), getMeasurements());
+    _webServer->setup(getDeviceName(), getMeasurements(), _configManager);
 }
 
 void RabbitIot::setupConfiguration() {

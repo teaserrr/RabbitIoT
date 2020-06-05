@@ -44,6 +44,7 @@ void ConfigManager::loadParameters() {
     while (error) {
         _log.error(PSTR("Failed to deserialize json:"));
         _log.error(error.c_str());
+        _log.log(LOGLEVEL_INFO, PSTR("capacity = %d - doc.capacity() = "), capacity, doc.capacity());
         if (error != DeserializationError::NoMemory || doc.capacity() == 0) // capacity 0 means allocation failed
             break;
         capacity += 128;
