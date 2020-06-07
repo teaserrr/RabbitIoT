@@ -20,8 +20,6 @@ class WebServer {
         void handleConfiguration();
         void handleSave();
 
-        static WebServer* _instance;
-
     protected:
         Logger _logger;
 

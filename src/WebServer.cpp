@@ -1,21 +1,10 @@
 #include "WebServer.h"
 #include "HtmlDefines.h"
 
-WebServer* WebServer::_instance;
-
-void serverHandleRoot() {
-    WebServer::_instance->handleRoot();
-}
-
-void serverHandleConfiguration() {
-    WebServer::_instance->handleConfiguration();
-}
-
 WebServer::WebServer(const Logger& logger, int port) {
     _logger = logger;
     _server = new ESP8266WebServer(port);
     _measurements = NULL;
-    _instance = this;
 }
 
 WebServer::~WebServer() {
