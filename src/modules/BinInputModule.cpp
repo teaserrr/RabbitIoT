@@ -25,3 +25,9 @@ void BinInputModule::loopInner() {
 
     _state->updateValue(BoolData(newState));
 }
+
+bool BinInputModule::getState() {
+    if (_state->data())
+        return ((BoolData*)_state->data())->value();
+    return false;
+} 

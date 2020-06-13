@@ -14,6 +14,10 @@ Measurement::Measurement(const Logger& logger, const char* id, const char* descr
     _lastPublish = 0;
     _data = NULL;
     _firstTimePublish = true;
+
+    for (int i=0; i<MAX_STATELISTENERS; i++) {
+        _stateListeners[i] = NULL;
+    }
 }
 
 Measurement::~Measurement() {
@@ -26,7 +30,8 @@ void Measurement::updateValue(const BaseData& value) {
         _data = value.copy();
         updateTimestamp();
         setUpdated();
-        _log.log(LOGLEVEL_TRACE, PSTR("%s updateValue - updated"), _id);
+        _log.log(LOGLEVEL_INFO, PSTR("%s updateValue - updated: %s"), _id, _data->stringValue());
+        notifyListeners();
     }
 }
 
@@ -49,6 +54,25 @@ void Measurement::setPublished() {
 void Measurement::resetUpdated() { 
     _isUpdated = false; 
     _firstTimePublish = false; 
+}
+
+void Measurement::addStateListener(StateListener* listener) {
+    int i = 0;
+    while (_stateListeners[i] && i < MAX_STATELISTENERS) {        
+        i++;
+    }
+    if (i < MAX_STATELISTENERS)
+        _stateListeners[i] = listener;
+    else
+        _log.log(LOGLEVEL_WARNING, PSTR("Measurement %s: Maximum amount of listeners exceeded. Increase MAX_STATELISTENERS to fix this."), _id);
+}
+
+void Measurement::notifyListeners() {
+    int i = 0;
+    while (_stateListeners[i] && i < MAX_STATELISTENERS) {
+        _stateListeners[i]->onStateChanged(this);
+        i++;
+    }
 }
 
 void Measurement::updateTimestamp(unsigned long timestamp) {

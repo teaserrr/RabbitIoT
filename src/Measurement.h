@@ -3,6 +3,7 @@
 
 #include "Logger.h"
 #include "Data.h"
+#include "StateListener.h"
 
 #define I_1MINUTE 60000
 #define I_1HOUR 3600000
@@ -65,10 +66,13 @@ class Measurement {
         // Marks the value as published over MQTT.
         void setPublished();
 
+        void addStateListener(StateListener* listener);
+
     protected:
         void updateTimestamp(unsigned long timestamp=0);
         void setUpdated() { _isUpdated = true; }
         void resetUpdated();
+        void notifyListeners();
         bool intervalExceeded(unsigned long interval) const;
 
     private:
@@ -85,6 +89,8 @@ class Measurement {
         unsigned long _lastPublish;
         bool _isUpdated;
         bool _firstTimePublish;
+
+        StateListener* _stateListeners[MAX_STATELISTENERS];
 };
 
 #endif

@@ -21,6 +21,10 @@ class BinInputModule : public BaseModule {
 
         virtual void setup();
 
+        void addStateListener(StateListener* listener) { _state->addStateListener(listener); }
+
+        bool getState();
+
     protected:
         virtual void loopInner();
         
