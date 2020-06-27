@@ -17,8 +17,6 @@ class MqttClient {
         void loop();
         void publish(const char* topic, const char* payload);
 
-        static MqttClient* _instance;
-
         void onMessageReceived(const char* topic, byte* payload, unsigned int length);
 
     private:

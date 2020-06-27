@@ -1,10 +1,5 @@
 #include "MqttClient.h"
-
-MqttClient* MqttClient::_instance;
-
-void onMqttMessageReceived(char* topic, byte* payload, unsigned int length) {
-    MqttClient::_instance->onMessageReceived(topic, payload, length);
-}
+#include <functional>
 
 MqttClient::MqttClient(const Logger& logger, const char* clientId, const char* host, uint16_t port) {
     _logger = logger;
@@ -14,7 +9,6 @@ MqttClient::MqttClient(const Logger& logger, const char* clientId, const char* h
     _pubSubClient = NULL;
     _wifiClient = NULL;
     _lastMqttReconnectAttempt = 0;
-    _instance = this;
 }
 
 MqttClient::~MqttClient() {
@@ -46,7 +40,8 @@ void MqttClient::createClient() {
     _pubSubClient = new PubSubClient(*_wifiClient);
     _logger.log(LOGLEVEL_INFO, PSTR("MQTT server: %s - port: %u"), _cHost->getValue(), _cPort->getIntValue());
     _pubSubClient->setServer(_cHost->getValue(), _cPort->getIntValue());
-    _pubSubClient->setCallback(onMqttMessageReceived);
+    using namespace std::placeholders;
+    _pubSubClient->setCallback(std::bind(&MqttClient::onMessageReceived, this, _1, _2, _3));
 }
 
 void MqttClient::loop()
