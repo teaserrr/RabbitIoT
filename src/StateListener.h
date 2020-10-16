@@ -5,7 +5,8 @@
 
 class Measurement;
 
-typedef void (*ListenerFunc) (const Measurement* measurement);
+//typedef void (*ListenerFunc) (const Measurement* measurement);
+typedef std::function<void(const Measurement* measurement)> ListenerFunc;
 
 class StateListener {
     public: 
