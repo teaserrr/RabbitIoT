@@ -54,6 +54,7 @@ class RabbitIot {
         void setupMqtt();
         void setupWebServer();
         void setupConfiguration();
+        void setupOTA();
         
         // Gets an array of all measurements of all modules.
         // The size of the array may be larger than the amount of measurements. The last item in the array is always NULL.

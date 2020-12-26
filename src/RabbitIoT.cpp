@@ -1,6 +1,7 @@
 #include "RabbitIoT.h"
 #include <WiFiManager.h>
 #include <WString.h>
+#include <ArduinoOTA.h>
 
 RabbitIot::RabbitIot(const char* deviceName, const char* mqttHost, const Logger& logger) {
     _deviceName = deviceName;
@@ -40,9 +41,11 @@ void RabbitIot::setup() {
     setupMqtt();
     setupConfiguration();
     setupWebServer();
+    setupOTA();
 }
 
 void RabbitIot::loop() {
+    ArduinoOTA.handle();
     _mqttClient->loop();
     _webServer->loop();
 
@@ -66,6 +69,30 @@ void RabbitIot::setupWifi() {
 #endif
     _logger.log(LOGLEVEL_INFO, PSTR("Connected to: %s"), WiFi.SSID().c_str());
     _logger.log(LOGLEVEL_INFO, PSTR("IP address: %s"), WiFi.localIP().toString().c_str());
+}
+
+void RabbitIot::setupOTA()
+{
+    _logger.debug(PSTR("Setting up OTA..."));
+    ArduinoOTA.setHostname(getDeviceName());
+    ArduinoOTA.onStart([]() {
+        Serial.println(PSTR("OTA Start"));
+    });
+    ArduinoOTA.onEnd([]() {
+        Serial.println(PSTR("\nOTA End"));
+    });
+    ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
+        Serial.printf(PSTR("OTA Progress: %u%%\r"), (progress / (total / 100)));
+    });
+    ArduinoOTA.onError([](ota_error_t error) {
+        Serial.printf(PSTR("OTA Error[%u]: "), error);
+        if (error == OTA_AUTH_ERROR) Serial.println(PSTR("Auth Failed"));
+        else if (error == OTA_BEGIN_ERROR) Serial.println(PSTR("Begin Failed"));
+        else if (error == OTA_CONNECT_ERROR) Serial.println(PSTR("Connect Failed"));
+        else if (error == OTA_RECEIVE_ERROR) Serial.println(PSTR("Receive Failed"));
+        else if (error == OTA_END_ERROR) Serial.println(PSTR("End Failed"));
+    });
+    ArduinoOTA.begin();
 }
 
 void RabbitIot::setupMqtt()
