@@ -37,6 +37,8 @@ class DarknessSensorModule : public BaseModule {
 
         virtual void setup();
         
+        void addStateListener(StateListener* listener) { _mState->addStateListener(listener); }
+
         bool isDarkness();
 
     protected:
