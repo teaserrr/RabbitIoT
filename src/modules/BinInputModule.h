@@ -28,7 +28,6 @@ class BinInputModule : public BaseModule {
     protected:
         virtual void loopInner();
         
-    private:
         Measurement* _state;
         uint8_t _pin;
 };
