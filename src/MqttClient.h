@@ -19,6 +19,9 @@ class MqttClient {
 
         void onMessageReceived(const char* topic, byte* payload, unsigned int length);
 
+        ConfigParameter* getHostConfigParameter() const { return _cHost; }
+        ConfigParameter* getPortConfigParameter() const { return _cPort; }
+
     private:
         void createClient();
         bool reconnect();

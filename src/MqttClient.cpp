@@ -89,7 +89,8 @@ void MqttClient::createSubscriptions() {
     ConfigParameter** parameters = _configManager->getParameters();
     int i = 0;
     while (parameters[i]) {
-        _pubSubClient->subscribe(parameters[i]->getMqttTopic());
+        if (parameters[i]->getMqttTopic() != NULL)
+            _pubSubClient->subscribe(parameters[i]->getMqttTopic());
         i++;
     }
 }

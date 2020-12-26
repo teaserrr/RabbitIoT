@@ -23,6 +23,7 @@ void WebServer::setup(const char* deviceName, Measurement** measurements, Config
     addUriHandler("/", std::bind(&WebServer::handleRoot, this));
     addUriHandler("/configuration", std::bind(&WebServer::handleConfiguration, this));
     addUriHandler("/save", std::bind(&WebServer::handleSave, this));
+    addUriHandler("/reboot", std::bind(&WebServer::handleReboot, this));
 
     _server->begin();
     _logger.info(PSTR("Web server started"));
@@ -111,11 +112,41 @@ void WebServer::handleSave() {
         i++;
     }
     if (save) {
-        _configManager->saveParameters();
-        html += "Configuration saved!"; // TODO
+        size_t bytesWritten = _configManager->saveParameters();
+        if (bytesWritten == 0) {
+            html += FPSTR(RABBIT_HTTP_CONFIG_FAILED);
+        }
+        else {
+            html += FPSTR(RABBIT_HTTP_CONFIG_SAVED);
+            html.replace(F("{bytes}"), String(bytesWritten));
+        }
+    }
+    else {
+        html += FPSTR(RABBIT_HTTP_CONFIG_NOTHING);
     }
 
+    html += FPSTR(RABBIT_HTTP_BUTTON_ROW);
+    html += FPSTR(RABBIT_HTTP_HOME_BUTTON);
+    html += FPSTR(RABBIT_HTTP_REBOOT_BUTTON);
     html += FPSTR(RABBIT_HTTP_END);
     
     _server->send(200, F("text/html"), html); 
+}
+
+void(* resetFunc) (void) = 0;
+
+void WebServer::handleReboot() {
+    _logger.info(PSTR("WebServer handle reboot"));
+
+    String html = FPSTR(RABBIT_HTTP_HEADER);
+    html += FPSTR(RABBIT_HTTP_STYLE);
+    html += FPSTR(RABBIT_HTTP_REDIRECT);
+    html += FPSTR(RABBIT_HTTP_BODY);
+    html += FPSTR(RABBIT_HTTP_REBOOT);
+    html += FPSTR(RABBIT_HTTP_END);
+    html.replace(F("{device}"), _deviceName);
+    _server->send(200, F("text/html"), html); 
+
+    delay(1000);
+    resetFunc();
 }

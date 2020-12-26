@@ -29,6 +29,8 @@ const char RABBIT_HTTP_STYLE[] PROGMEM =
 "   @media screen and (max-width: 650px) { .table {	width: 100%; } .sidebyside { width: 100%; } }" \
 "   @media screen and (max-width: 450px) { .button {width: 100%;  margin-left: initial; } }" \
 "   </style>";
+const char RABBIT_HTTP_REDIRECT[] PROGMEM = 
+"  <meta http-equiv=\"refresh\" content=\"10; URL=/\">";
 const char RABBIT_HTTP_BODY[] PROGMEM = 
 "  </head>" \
 "  <body>" \
@@ -56,12 +58,24 @@ const char RABBIT_HTTP_CONFIG_ITEM[] PROGMEM =
 "        </div>";
 const char RABBIT_HTTP_TABLE_END[] PROGMEM =
 "      </div>";
+const char RABBIT_HTTP_CONFIG_SAVED[] PROGMEM =
+"      <p>Configuration saved, {bytes} bytes written.";
+const char RABBIT_HTTP_CONFIG_FAILED[] PROGMEM =
+"      <p>Saving configuration failed!";
+const char RABBIT_HTTP_CONFIG_NOTHING[] PROGMEM =
+"      <p>There was nothing to update.";
+const char RABBIT_HTTP_REBOOT[] PROGMEM =
+"      <p>Rebooting, please wait...";
 const char RABBIT_HTTP_BUTTON_ROW[] PROGMEM =
 "      <div class=\"sidebyside\">";
 const char RABBIT_HTTP_CONFIG_BUTTON[] PROGMEM =
-"      <a class=\"button\" href=\"configuration\">Configuration</a>";
+"      <a class=\"button\" href=\"/configuration\">Configuration</a>";
 const char RABBIT_HTTP_CANCEL_BUTTON[] PROGMEM =
 "      <a class=\"button left\" href=\"/\">Cancel</a>";
+const char RABBIT_HTTP_HOME_BUTTON[] PROGMEM =
+"      <a class=\"button left\" href=\"/\">Home</a>";
+const char RABBIT_HTTP_REBOOT_BUTTON[] PROGMEM =
+"      <a class=\"button right\" href=\"/reboot\">Reboot</a>";
 const char RABBIT_HTTP_SAVE_BUTTON[] PROGMEM =
 "      <input class=\"button right\" type=\"submit\" value=\"Save\"/>";
 const char RABBIT_HTTP_FORM_END[] PROGMEM = 

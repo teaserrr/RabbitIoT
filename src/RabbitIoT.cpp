@@ -144,8 +144,12 @@ Measurement** RabbitIot::getMeasurements() const {
 }
 
 ConfigParameter** RabbitIot::getConfigParameters() const {
-    ConfigParameter** parameters = new ConfigParameter*[_moduleCount * MAX_CONFIG_PARAMETERS + 1];
+    ConfigParameter** parameters = new ConfigParameter*[_moduleCount * MAX_CONFIG_PARAMETERS + 2 + 1];
     int index = 0;
+    // add parameters from MQTT client
+    parameters[index++] = _mqttClient->getHostConfigParameter();
+    parameters[index++] = _mqttClient->getPortConfigParameter();
+
     for (int i = 0; i < _moduleCount; i++) {
         ConfigParameter** moduleParameters = _modules[i]->getConfigParameters();
         int j = 0;

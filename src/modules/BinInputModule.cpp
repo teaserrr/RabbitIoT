@@ -21,7 +21,7 @@ void BinInputModule::setup() {
 
 void BinInputModule::loopInner() {
     bool newState = digitalRead(_pin);
-    _log.log(LOGLEVEL_DEBUG, PSTR("state: %s"), newState ? PSTR("high") : PSTR("low"));
+    _log.log(LOGLEVEL_TRACE, PSTR("%s state: %s"), getId(), newState ? PSTR("high") : PSTR("low"));
 
     _state->updateValue(BoolData(newState));
 }

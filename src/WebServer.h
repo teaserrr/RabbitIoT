@@ -19,6 +19,7 @@ class WebServer {
         void handleRoot();
         void handleConfiguration();
         void handleSave();
+        void handleReboot();
 
     protected:
         Logger _logger;

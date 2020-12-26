@@ -71,11 +71,11 @@ void ConfigManager::loadParameters(const DynamicJsonDocument& document) {
     }
 }
 
-void ConfigManager::saveParameters() {
+size_t ConfigManager::saveParameters() {
     _log.info(PSTR("Saving configuration parameters"));
 
     if (!_parameters[0])
-        return; // no parameters
+        return 0; // no parameters
 
     DynamicJsonDocument document(_jsonSize);
     int i = 0;
@@ -89,11 +89,13 @@ void ConfigManager::saveParameters() {
     File configFile = SPIFFS.open(CONFIG_FILE_PATH, "w");
     if (!configFile) {
         _log.error(PSTR("Failed to open config file for writing"));
+        return 0;
     }
 
     _log.debug(PSTR("  serializing json"));
-    serializeJson(document, configFile);
+    size_t written = serializeJson(document, configFile);
     configFile.close();
+    return written;
 }
 
 ConfigParameter* ConfigManager::getParameterByMqttTopic(const char* mqttTopic) {
