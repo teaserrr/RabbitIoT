@@ -101,11 +101,10 @@ size_t ConfigManager::saveParameters() {
 ConfigParameter* ConfigManager::getParameterByMqttTopic(const char* mqttTopic) {
     int i = 0;
     while (_parameters[i]) {
-        if (strcmp(mqttTopic, _parameters[i]->getMqttTopic()) == 0)
+        if (_parameters[i]->getMqttTopic() && strcmp(mqttTopic, _parameters[i]->getMqttTopic()) == 0)
             return _parameters[i];
         i++;
     }
-    _log.log(LOGLEVEL_WARNING, PSTR("Config parameter for topic %s not found"), mqttTopic);
     return NULL;
 }
 

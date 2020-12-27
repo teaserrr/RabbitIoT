@@ -124,8 +124,11 @@ ConfigParameter* BaseModule::getConfigParameter(const char* id) const {
 
 char* concat(const char* str1, const char* str2) {
     size_t len = strlen(str1) + strlen(str2);
+    bool slash = str1[strlen(str1)-1] == '/' || str2[0] == '/';
+    if (!slash) len++;
     char* buf = new char[len+1];
     strcpy(buf, str1);
+    if (!slash) strcat(buf, "/");
     strcat(buf, str2);
     return buf;
 }
