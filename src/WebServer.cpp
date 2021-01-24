@@ -1,5 +1,6 @@
 #include "WebServer.h"
 #include "HtmlDefines.h"
+#include "modules/BaseModule.h"
 
 WebServer::WebServer(const Logger& logger, int port) {
     _logger = logger;
@@ -46,7 +47,8 @@ void WebServer::handleRoot() {
     int i = 0;
     while (_measurements[i]) {
         String tempHtml = FPSTR(RABBIT_HTTP_ITEM);
-        tempHtml.replace(F("{key}"), _measurements[i]->getDescription());
+        tempHtml.replace(F("{key}"), String(_measurements[i]->getModule()->getId()) + " " + 
+                                     String(_measurements[i]->getDescription()));
         tempHtml.replace(F("{value}"), _measurements[i]->getStringValue());
         tempHtml.replace(F("{unit}"), _measurements[i]->getUnit());
         html += tempHtml;

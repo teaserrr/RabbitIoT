@@ -9,6 +9,8 @@
 #define I_1HOUR 3600000
 #define I_1DAY 86400000
 
+class BaseModule;
+
 /**
  * Represents a single sensor measurement, such as an on/off state, temperature or light value.
  * 
@@ -20,6 +22,7 @@ class Measurement {
         /**
          * Parameters:
          * - id: used to identify the measurement. Keep the id fairly short and concise.
+         * - module: the module owning this measurement.
          * - description: human readable description of the measurement. Displayed in the web interface.
          * - unit: unit of the measurement. E.g. "°C", "lux", or just an empty string. Displayed in the web interface.
          * - mqttTopic: path of the MQTT topic to publish the value of the measurement. E.g. "sensors/temperature". When NULL, the measurement
@@ -33,7 +36,7 @@ class Measurement {
          *                       will be published at maximum each second if the measurement changes more often than that. If the measurement changes 
          *                       less often though, it will be published only when it has changed.
          */
-        Measurement(const Logger& logger, const char* id, const char* description = NULL, const char* unit = NULL, const char* mqttTopic = NULL, 
+        Measurement(const Logger& logger, const char* id, const BaseModule* module, const char* description = NULL, const char* unit = NULL, const char* mqttTopic = NULL, 
                     unsigned long minPublishInterval = 0, unsigned long maxPublishInterval = 0);
         ~Measurement();
 
@@ -68,6 +71,8 @@ class Measurement {
 
         void addStateListener(StateListener* listener);
 
+        const BaseModule* getModule() const { return _module; }
+
     protected:
         void updateTimestamp(unsigned long timestamp=0);
         void setUpdated() { _isUpdated = true; }
@@ -77,6 +82,7 @@ class Measurement {
 
     private:
         Logger _log;
+        const BaseModule* _module;
         const BaseData* _data;
         const char* _id;
         const char* _description;

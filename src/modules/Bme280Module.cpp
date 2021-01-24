@@ -26,9 +26,9 @@ Bme280Module::~Bme280Module() {
 void Bme280Module::setup() {
     _log.debug(PSTR("Setting up Bme280Module..."));
     _bme = new Adafruit_BME280();
-    _temperature = new Measurement(_log, ID_TEMPERATURE, "Temperature", "°C", concat(getMqttPath(), ID_TEMPERATURE));
-    _humidity = new Measurement(_log, ID_HUMIDITY, "Humidity", "%", concat(getMqttPath(), ID_HUMIDITY));
-    _pressure = new Measurement(_log, ID_PRESSURE, "Pressure", "hPa", concat(getMqttPath(), ID_PRESSURE), 0, I_1HOUR);
+    _temperature = new Measurement(_log, ID_TEMPERATURE, this, "Temperature", "°C", concat(getMqttPath(), ID_TEMPERATURE));
+    _humidity = new Measurement(_log, ID_HUMIDITY, this, "Humidity", "%", concat(getMqttPath(), ID_HUMIDITY));
+    _pressure = new Measurement(_log, ID_PRESSURE, this, "Pressure", "hPa", concat(getMqttPath(), ID_PRESSURE), 0, I_1HOUR);
     addMeasurement(_temperature);
     addMeasurement(_humidity);
     addMeasurement(_pressure);

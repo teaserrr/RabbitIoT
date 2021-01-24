@@ -1,9 +1,10 @@
 #include "Measurement.h"
 #include <Arduino.h>
 
-Measurement::Measurement(const Logger& logger, const char* id, const char* description, const char* unit, const char* mqttTopic, unsigned long minPublishInterval , unsigned long maxPublishInterval) {
+Measurement::Measurement(const Logger& logger, const char* id, const BaseModule* module, const char* description, const char* unit, const char* mqttTopic, unsigned long minPublishInterval , unsigned long maxPublishInterval) {
     _log = logger;
     _id = id;
+    _module = module;
     _description = description;
     _unit = unit;
     _mqttTopic = mqttTopic;
